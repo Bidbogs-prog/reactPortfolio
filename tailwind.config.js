@@ -1,3 +1,5 @@
+import { transform } from "typescript";
+
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: ["class"],
@@ -6,11 +8,24 @@ export default {
     extend: {
       animation: {
         blink: "blink 1.5s ease-in-out infinite",
+        blob: "blob 5s infinite",
       },
       keyframes: {
         blink: {
           "0%, 100%": { opacity: "1" },
           "50%": { opacity: "0" },
+        },
+        blob: {
+          "0%": {
+            transform: "scale(1)",
+          },
+          "50%": {
+            transform: "scale(1.1)",
+          },
+
+          "100%": {
+            transform: "scale(1)",
+          },
         },
       },
 
