@@ -6,7 +6,12 @@ function App() {
     <>
       <div className="w-screen h-screen ">
         <div className="navBar flex justify-end">
-          <h3 className="text-[30px] mr-auto ml-[20px] mt-[8px]">HC</h3>
+          <Button
+            className="text-[20px] pb-0 mr-auto ml-[20px] mt-[8px]"
+            variant={"ghost"}
+          >
+            HC
+          </Button>
           <Button className="mt-3" variant={"link"}>
             About me
           </Button>
