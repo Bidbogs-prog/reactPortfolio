@@ -46,7 +46,7 @@ export default function ProjectsSection() {
     {
       title: "Tale",
       description:
-        "A birthday gift I made for my Fiancée's on Valentine's using a poem I wrote.",
+        "A birthday gift I made for my Fiancée on Valentine's using a poem I wrote.",
       tags: ["Next.js", "Tailwind CSS", "Responsive design"],
       demoUrl:
         "https://tale-isaquq4as-haytham-chhilifs-projects.vercel.app/poem",
