@@ -41,10 +41,30 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* Animated blobs */}
-      <div className="absolute mix-blend-multiply opacity-70 filter blur-xl top-1/4 bg-black rounded-full w-72 h-72 right-[10%] md:right-[20%] animate-blob"></div>
-      <div className="absolute mix-blend-multiply opacity-70 filter blur-xl top-1/3 bg-gray-800 rounded-full w-72 h-72 right-[5%] animate-blob animation-delay-2000"></div>
-      <div className="absolute mix-blend-multiply opacity-70 filter blur-xl top-1/5 bg-slate-800 rounded-full w-72 h-72 right-[15%] animate-blob animation-delay-4000"></div>
+      {/* Responsive animated blobs */}
+      <div
+        className="absolute mix-blend-multiply opacity-70 filter blur-xl 
+                      top-1/4 bg-black rounded-full 
+                      w-48 h-48 sm:w-56 sm:h-56 md:w-72 md:h-72 lg:w-80 lg:h-80
+                      right-[5%] sm:right-[8%] md:right-[20%] 
+                      animate-blob"
+      ></div>
+
+      <div
+        className="absolute mix-blend-multiply opacity-70 filter blur-xl 
+                      top-1/3 bg-gray-800 rounded-full 
+                      w-40 h-40 sm:w-48 sm:h-48 md:w-72 md:h-72 lg:w-80 lg:h-80
+                      right-[2%] sm:right-[3%] md:right-[5%] 
+                      animate-blob animation-delay-2000"
+      ></div>
+
+      <div
+        className="absolute mix-blend-multiply opacity-70 filter blur-xl 
+                      top-1/5 bg-slate-800 rounded-full 
+                      w-44 h-44 sm:w-52 sm:h-52 md:w-72 md:h-72 lg:w-80 lg:h-80
+                      right-[8%] sm:right-[12%] md:right-[15%] 
+                      animate-blob animation-delay-4000"
+      ></div>
     </section>
   );
 }
