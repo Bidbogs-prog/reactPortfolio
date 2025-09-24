@@ -30,14 +30,16 @@ export default function Navbar() {
         isScrolled ? "bg-background/80 backdrop-blur-md shadow-sm" : ""
       }`}
     >
-      <div className="container mx-auto flex items-center justify-between py-4">
-        <Button
-          className="text-xl font-bold"
-          variant="ghost"
-          onClick={() => scrollToSection("hero")}
-        >
-          HC
-        </Button>
+      <div
+        id="logo"
+        className="container mx-auto flex items-center justify-between py-4"
+      >
+        <img
+          src="/favicon.ico"
+          alt="Logo"
+          className="h-10 w-auto hover:cursor-pointer"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        />
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-1">

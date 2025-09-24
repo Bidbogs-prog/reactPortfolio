@@ -155,14 +155,16 @@ export default function ContactSection() {
                 <Mail className="h-5 w-5 mr-3 text-primary" />
                 <div>
                   <h3 className="font-medium">Email</h3>
-                  <p className="text-muted-foreground">haytham@example.com</p>
+                  <p className="text-muted-foreground">
+                    haythamchhilif@gmail.com
+                  </p>
                 </div>
               </div>
               <div className="flex items-start">
                 <Phone className="h-5 w-5 mr-3 text-primary" />
                 <div>
                   <h3 className="font-medium">Phone</h3>
-                  <p className="text-muted-foreground">+1 (555) 123-4567</p>
+                  <p className="text-muted-foreground">(+212) 6 60 63 93 04</p>
                 </div>
               </div>
               <div className="flex items-start">
@@ -170,7 +172,7 @@ export default function ContactSection() {
                 <div>
                   <h3 className="font-medium">Location</h3>
                   <p className="text-muted-foreground">
-                    Remote - Available Worldwide
+                    Morocco - Available for remote work
                   </p>
                 </div>
               </div>
@@ -180,7 +182,7 @@ export default function ContactSection() {
                 <div className="flex space-x-4">
                   <Button variant="outline" size="icon" asChild>
                     <a
-                      href="#"
+                      href="https://github.com/Bidbogs-prog"
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label="GitHub"
@@ -201,7 +203,7 @@ export default function ContactSection() {
                   </Button>
                   <Button variant="outline" size="icon" asChild>
                     <a
-                      href="#"
+                      href="https://www.linkedin.com/in/haytham-chhilif-aba5171a3"
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label="LinkedIn"
@@ -224,7 +226,7 @@ export default function ContactSection() {
                   </Button>
                   <Button variant="outline" size="icon" asChild>
                     <a
-                      href="#"
+                      href="https://x.com/HaythamChhilif"
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label="Twitter"

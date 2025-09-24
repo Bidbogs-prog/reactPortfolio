@@ -13,28 +13,44 @@ import { ExternalLink, Github } from "lucide-react";
 export default function ProjectsSection() {
   const projects = [
     {
-      title: "E-Commerce Platform",
+      title: "Algorithme Auto",
       description:
-        "A full-stack e-commerce solution with payment processing and inventory management.",
-      tags: ["React", "Node.js", "MongoDB", "Stripe"],
-      demoUrl: "#",
-      githubUrl: "#",
+        "A full-stack car rental agency solution for fleet and client management",
+      tags: [
+        "Angular",
+        "Nest.js",
+        "Postgres",
+        "Docker",
+        "Typescript",
+        "RxJS",
+        "Tailwind",
+        "Responsive design",
+      ],
+      demoUrl: "https://algorithmeauto.chhilif.com",
+      githubUrl: "https://github.com/Bidbogs-prog/algorithme-auto-front",
     },
     {
-      title: "Task Management App",
+      title: "Expensio",
       description:
-        "A productivity application for managing tasks, projects, and team collaboration.",
-      tags: ["Next.js", "TypeScript", "Prisma", "Tailwind CSS"],
-      demoUrl: "#",
-      githubUrl: "#",
+        "An expense tracker app that helps you log different income sources, expenses, and your overall balance, with customized financial recommendations.",
+      tags: [
+        "Next.js",
+        "TypeScript",
+        "Supabase",
+        "Tailwind CSS",
+        "Responsive design",
+      ],
+      demoUrl: "https://expensio-tau.vercel.app",
+      githubUrl: "https://github.com/Bidbogs-prog/expensio",
     },
     {
-      title: "Portfolio Website",
+      title: "Tale",
       description:
-        "A responsive portfolio website showcasing projects and skills.",
-      tags: ["React", "Tailwind CSS", "Framer Motion"],
-      demoUrl: "#",
-      githubUrl: "#",
+        "A birthday gift I made for my Fiancée's on Valentine's using a poem I wrote.",
+      tags: ["Next.js", "Tailwind CSS", "Responsive design"],
+      demoUrl:
+        "https://tale-isaquq4as-haytham-chhilifs-projects.vercel.app/poem",
+      githubUrl: "https://github.com/Bidbogs-prog/tale",
     },
   ];
 
