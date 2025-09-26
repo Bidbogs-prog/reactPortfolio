@@ -1,7 +1,6 @@
 "use client";
 
 import type React from "react";
-import dotenv from "dotenv";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
