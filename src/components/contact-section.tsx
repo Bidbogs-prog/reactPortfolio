@@ -1,6 +1,7 @@
 "use client";
 
 import type React from "react";
+import dotenv from "dotenv";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,14 @@ export default function ContactSection() {
     message: "",
   });
 
+  const [status, setStatus] = useState<{
+    type: "success" | "error" | null;
+    message: string;
+  }>({
+    type: null,
+    message: "",
+  });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (
@@ -35,9 +44,32 @@ export default function ContactSection() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setStatus({ type: null, message: "" });
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const res = await fetch(process.env.DISCORD_URL!, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setStatus({ type: "success", message: "Message sent successfully!" });
+        setFormData({ name: "", email: "", message: "" });
+      } else {
+        setStatus(data.error || "Something went wrong");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setStatus({
+        type: "error",
+        message: "An error occurred. Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
 
     // Reset form
     setFormData({ name: "", email: "", message: "" });
@@ -139,6 +171,17 @@ export default function ContactSection() {
                     </span>
                   )}
                 </Button>
+                {status.type && (
+                  <p
+                    className={`mt-2 text-sm ${
+                      status.type === "success"
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }`}
+                  >
+                    {status.message}
+                  </p>
+                )}
               </form>
             </CardContent>
           </Card>
