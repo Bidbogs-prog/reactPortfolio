@@ -46,7 +46,8 @@ export default function ContactSection() {
     setStatus({ type: null, message: "" });
 
     try {
-      const res = await fetch(process.env.DISCORD_URL!, {
+      const envvar = import.meta.env.VITE_DISCORD_URL || "zbi";
+      const res = await fetch(envvar, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
