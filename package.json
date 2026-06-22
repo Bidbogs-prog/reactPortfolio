@@ -15,12 +15,8 @@
     "@radix-ui/react-slot": "^1.1.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "dotenv": "^17.2.2",
-    "install": "^0.13.0",
     "lucide-react": "^0.469.0",
-    "npm": "^10.9.2",
     "react": "^18.3.1",
-    "react-awesome-shapes": "^0.1.6",
     "react-dom": "^18.3.1",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7"

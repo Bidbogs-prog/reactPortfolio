@@ -1,113 +1,105 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ExternalLink, Github } from "lucide-react";
+import { SectionHeading } from "@/components/section-heading";
+import { Reveal } from "@/components/reveal";
+import { projects } from "@/data/projects";
+import { ArrowUpRight, Github } from "lucide-react";
 
 export default function ProjectsSection() {
-  const projects = [
-    {
-      title: "Algorithme Auto",
-      description:
-        "A full-stack car rental agency solution for fleet and client management",
-      tags: [
-        "Angular",
-        "Nest.js",
-        "Postgres",
-        "Docker",
-        "Typescript",
-        "RxJS",
-        "Tailwind",
-        "Responsive design",
-      ],
-      demoUrl: "https://algorithmeauto.chhilif.com",
-      githubUrl: "https://github.com/Bidbogs-prog/algorithme-auto-front",
-    },
-    {
-      title: "Expensio",
-      description:
-        "An expense tracker app that helps you log different income sources, expenses, and your overall balance, with customized financial recommendations.",
-      tags: [
-        "Next.js",
-        "TypeScript",
-        "Supabase",
-        "Tailwind CSS",
-        "Responsive design",
-      ],
-      demoUrl: "https://expensio-tau.vercel.app",
-      githubUrl: "https://github.com/Bidbogs-prog/expensio",
-    },
-    {
-      title: "Tale",
-      description:
-        "A birthday gift I made for my Fiancée on Valentine's using a poem I wrote.",
-      tags: ["Next.js", "Tailwind CSS", "Responsive design"],
-      demoUrl: "https://tale-eta.vercel.app",
-      githubUrl: "https://github.com/Bidbogs-prog/tale",
-    },
-  ];
-
   return (
-    <section id="projects" className="py-20 bg-muted/50">
-      <div className="container mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center">
-          Projects
-        </h2>
-        <p className="text-muted-foreground text-center max-w-2xl mx-auto mb-12">
-          Here are some of the projects I've worked on. Each project represents
-          different skills and technologies I've mastered.
-        </p>
+    <section
+      id="work"
+      className="relative border-t border-border/60 bg-muted/20 py-24 md:py-32"
+    >
+      <div className="container">
+        <SectionHeading
+          num="02"
+          eyebrow="Selected Work"
+          title="Things I've built"
+        />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.map((project, index) => (
-            <Card
-              key={index}
-              className="h-full flex flex-col hover:shadow-lg transition-shadow"
-            >
-              <CardHeader>
-                <CardTitle>{project.title}</CardTitle>
-                <CardDescription>{project.description}</CardDescription>
-              </CardHeader>
-              <CardContent className="flex-grow">
-                <div className="flex flex-wrap gap-2">
-                  {project.tags.map((tag, tagIndex) => (
-                    <Badge key={tagIndex} variant="secondary">
-                      {tag}
-                    </Badge>
-                  ))}
+        <div className="flex flex-col">
+          {projects.map((project, i) => (
+            <Reveal key={project.id} delay={i * 60}>
+              <article className="group relative grid gap-6 border-t border-border/60 py-10 md:grid-cols-[auto_1fr_auto] md:items-start md:gap-10">
+                {/* Index */}
+                <div className="font-mono text-sm text-muted-foreground/60">
+                  0{i + 1}
                 </div>
-              </CardContent>
-              <CardFooter className="flex justify-between">
-                <Button variant="outline" size="sm" asChild>
-                  <a
-                    href={project.githubUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Github className="mr-2 h-4 w-4" />
-                    Code
-                  </a>
-                </Button>
-                <Button size="sm" asChild>
+
+                {/* Body */}
+                <div className="max-w-2xl">
+                  <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                    <h3 className="font-display text-2xl font-semibold text-foreground transition-colors group-hover:text-primary md:text-3xl">
+                      {project.title}
+                    </h3>
+                    <span className="font-mono text-xs text-muted-foreground">
+                      {project.year}
+                    </span>
+                  </div>
+
+                  {project.highlight && (
+                    <p className="mt-2 text-sm font-medium text-primary/90">
+                      {project.highlight}
+                    </p>
+                  )}
+
+                  <p className="mt-3 text-pretty leading-relaxed text-muted-foreground">
+                    {project.description}
+                  </p>
+
+                  <ul className="mt-5 flex flex-wrap gap-2">
+                    {project.tags.map((tag) => (
+                      <li
+                        key={tag}
+                        className="rounded-md border border-border bg-card px-2.5 py-1 font-mono text-xs text-muted-foreground"
+                      >
+                        {tag}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Links */}
+                <div className="flex items-center gap-2 md:flex-col md:items-end">
                   <a
                     href={project.demoUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    aria-label={`View ${project.title} live`}
+                    className="flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm text-foreground transition-all hover:-translate-y-0.5 hover:border-primary hover:text-primary"
                   >
-                    <ExternalLink className="mr-2 h-4 w-4" />
-                    Demo
+                    Live
+                    <ArrowUpRight className="h-4 w-4" />
                   </a>
-                </Button>
-              </CardFooter>
-            </Card>
+                  <a
+                    href={project.githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`View ${project.title} source on GitHub`}
+                    className="flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm text-muted-foreground transition-all hover:-translate-y-0.5 hover:border-foreground/40 hover:text-foreground"
+                  >
+                    Code
+                    <Github className="h-4 w-4" />
+                  </a>
+                </div>
+              </article>
+            </Reveal>
           ))}
         </div>
+
+        <Reveal>
+          <div className="mt-12 border-t border-border/60 pt-10">
+            <a
+              href="https://github.com/Bidbogs-prog"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-2 font-mono text-sm text-muted-foreground transition-colors hover:text-primary"
+            >
+              <span className="text-primary">&#47;&#47;</span>
+              More on GitHub
+              <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            </a>
+          </div>
+        </Reveal>
       </div>
     </section>
   );

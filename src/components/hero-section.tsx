@@ -1,140 +1,127 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import { socials } from "@/data/socials";
+import { ArrowUpRight, ArrowDown } from "lucide-react";
+
+const ROLES = ["Full-Stack Development", "AI Integration", "Product Engineering"];
 
 export default function HeroSection() {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
-
-  const scrollToContact = () => {
-    const contactSection = document.getElementById("contact");
-    if (contactSection) {
-      contactSection.scrollIntoView({ behavior: "smooth" });
-    }
-  };
+  const scrollTo = (id: string) =>
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
   return (
-    <section id="hero" className="min-h-screen pt-20 relative overflow-hidden">
-      <div className="container mx-auto px-4">
-        <div
-          className={`flex flex-col items-start mt-16 md:mt-32 transition-all duration-1000 relative z-10 ${
-            isVisible ? "opacity-100" : "opacity-0 translate-y-10"
-          }`}
-        >
-          {/* Text with smart color mixing */}
-          <h2
-            className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 
-                         text-gray-900 
-                         mix-blend-difference
-                         transition-all duration-500"
-          >
-            Welcome to my little corner
-          </h2>
+    <section
+      id="hero"
+      className="relative flex min-h-screen items-center overflow-hidden"
+    >
+      {/* Ambient backdrop */}
+      <div className="pointer-events-none absolute inset-0 bg-grid [mask-image:radial-gradient(70%_60%_at_50%_30%,black,transparent)]" />
+      <div className="pointer-events-none absolute inset-0 bg-glow" />
+      <div className="pointer-events-none absolute -right-32 top-1/4 h-[28rem] w-[28rem] rounded-full bg-primary/10 blur-[120px]" />
 
+      <div className="container relative z-10 pt-28">
+        <div className="max-w-4xl">
+          {/* Eyebrow */}
           <p
-            className="text-base md:text-lg max-w-md md:max-w-xl leading-7 mb-8 
-                        text-gray-900 
-                        mix-blend-difference
-                        transition-all duration-500"
+            className="eyebrow mb-6 flex items-center gap-3 opacity-0"
+            style={{ animation: "fadeUp 0.7s 0.05s cubic-bezier(.22,1,.36,1) forwards" }}
           >
-            My name is Haytham Chhilif and I am a self-taught Web Developer
-            riding the ever-lasting journey towards mastering the craft. My
-            passions are learning new things and supporting your business with
-            simple, efficient, and creative tech solutions{" "}
-            <span className="inline-block w-[3px] h-5 bg-gray-900 animate-blink mix-blend-difference"></span>
+            <span className="inline-block h-px w-8 bg-primary/60" />
+            Full-Stack &amp; AI Engineer, Morocco
           </p>
 
-          {/* Button with backdrop for better visibility */}
-          <div className="relative">
+          {/* Headline */}
+          <h1
+            className="display text-balance text-5xl leading-[0.95] text-foreground sm:text-6xl md:text-7xl lg:text-8xl opacity-0"
+            style={{ animation: "fadeUp 0.8s 0.15s cubic-bezier(.22,1,.36,1) forwards" }}
+          >
+            I build <span className="text-primary">thoughtful</span>
+            <br />
+            software for the web.
+          </h1>
+
+          {/* Intro */}
+          <p
+            className="mt-8 max-w-xl text-pretty text-base leading-relaxed text-muted-foreground md:text-lg opacity-0"
+            style={{ animation: "fadeUp 0.8s 0.3s cubic-bezier(.22,1,.36,1) forwards" }}
+          >
+            I&apos;m Haytham Chhilif, a self-taught developer who turns ideas
+            into fast, polished products. These days I&apos;m focused on weaving{" "}
+            <span className="text-foreground">AI</span> into full-stack
+            applications that feel genuinely useful.
+            <span className="ml-1 inline-block h-5 w-[3px] translate-y-1 bg-primary animate-blink" />
+          </p>
+
+          {/* CTAs */}
+          <div
+            className="mt-10 flex flex-wrap items-center gap-4 opacity-0"
+            style={{ animation: "fadeUp 0.8s 0.45s cubic-bezier(.22,1,.36,1) forwards" }}
+          >
             <Button
               size="lg"
-              className="text-base bg-primary text-white hover:bg-primary/90 
-                         backdrop-blur-sm border border-white/20
-                         shadow-lg hover:shadow-xl transition-all duration-300
-                         relative z-20"
-              onClick={scrollToContact}
+              className="group h-12 px-6 text-sm font-semibold"
+              onClick={() => scrollTo("contact")}
             >
-              Contact me here
+              Start a project
+              <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
             </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="h-12 px-6 text-sm"
+              onClick={() => scrollTo("work")}
+            >
+              View selected work
+            </Button>
+
+            <div className="ml-1 flex items-center gap-1">
+              {socials.map(({ label, href, Icon }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-muted-foreground transition-all hover:-translate-y-0.5 hover:border-primary hover:text-primary"
+                >
+                  <Icon className="h-[18px] w-[18px]" />
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Rotating focus strip */}
+          <div
+            className="mt-16 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-border/60 pt-6 opacity-0"
+            style={{ animation: "fadeUp 0.8s 0.6s cubic-bezier(.22,1,.36,1) forwards" }}
+          >
+            {ROLES.map((role) => (
+              <span
+                key={role}
+                className="font-mono text-xs uppercase tracking-wider text-muted-foreground"
+              >
+                {role}
+              </span>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Responsive animated blobs - positioned behind text */}
-      <div className="absolute inset-0 z-0">
-        <div
-          className="absolute mix-blend-multiply opacity-60 filter blur-xl 
-                       top-1/4 bg-gray-800 rounded-full 
-                       w-48 h-48 sm:w-56 sm:h-56 md:w-72 md:h-72 lg:w-80 lg:h-80
-                       right-[5%] sm:right-[8%] md:right-[20%] 
-                       animate-blob"
-        ></div>
+      {/* Scroll hint */}
+      <button
+        onClick={() => scrollTo("about")}
+        aria-label="Scroll to about"
+        className="absolute bottom-8 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 text-muted-foreground transition-colors hover:text-primary md:flex"
+      >
+        <span className="font-mono text-[0.65rem] uppercase tracking-[0.2em]">
+          Scroll
+        </span>
+        <ArrowDown className="h-4 w-4 animate-bounce" />
+      </button>
 
-        <div
-          className="absolute mix-blend-multiply opacity-60 filter blur-xl 
-                       top-1/3 bg-slate-700 rounded-full 
-                       w-40 h-40 sm:w-48 sm:h-48 md:w-72 md:h-72 lg:w-80 lg:h-80
-                       right-[2%] sm:right-[3%] md:right-[5%] 
-                       animate-blob animation-delay-2000"
-        ></div>
-
-        <div
-          className="absolute mix-blend-multiply opacity-60 filter blur-xl 
-                       top-1/5 bg-gray-900 rounded-full 
-                       w-44 h-44 sm:w-52 sm:h-52 md:w-72 md:h-72 lg:w-80 lg:h-80
-                       right-[8%] sm:right-[12%] md:right-[15%] 
-                       animate-blob animation-delay-4000"
-        ></div>
-      </div>
-
-      {/* Custom animations using Tailwind's arbitrary values */}
       <style>{`
-        @keyframes blob {
-          0% {
-            transform: translate(0px, 0px) scale(1);
-          }
-          33% {
-            transform: translate(30px, -50px) scale(1.1);
-          }
-          66% {
-            transform: translate(-20px, 20px) scale(0.9);
-          }
-          100% {
-            transform: translate(0px, 0px) scale(1);
-          }
-        }
-        
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-        
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-
-        .animate-blink {
-          animation: blink 1s infinite;
-        }
-
-        @keyframes blink {
-          0%, 50% { opacity: 1; }
-          51%, 100% { opacity: 0; }
-        }
-
-        /* Enhanced mobile responsiveness */
-        @media (max-width: 640px) {
-          .animate-blob {
-            animation-duration: 10s !important;
-            opacity: 0.4 !important;
-          }
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(24px); }
+          to { opacity: 1; transform: translateY(0); }
         }
       `}</style>
     </section>
