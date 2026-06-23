@@ -1,0 +1,28 @@
+---
+title: "AI that doesn't feel like a gimmick"
+date: "2026-05-18"
+kind: "code"
+summary: "Notes from building support agents people actually trust, and the line between useful intelligence and a chatbot bolted onto a page."
+tags: ["AI", "Product", "LLM"]
+---
+
+Most "AI features" fail the same way: they announce themselves. A sparkle icon, a modal, a blinking widget that begs to be talked to. The intelligence is the headline instead of the plumbing.
+
+When I built support agents, the version people trusted was the quiet one. It answered the question and got out of the way. No personality cosplay, no "As an AI language model." Just the right answer, fast, with a link to the source.
+
+## Three rules I keep coming back to
+
+1. **Latency is a feature.** A correct answer in four seconds loses to a decent one in four hundred milliseconds. Stream tokens, show intent early.
+2. **Ground everything.** If the model can't cite where an answer came from, it shouldn't say it with confidence.
+3. **Let it say "I don't know."** The fastest way to lose trust is one confident hallucination in front of a paying customer.
+
+```ts
+// The whole trick: retrieve first, generate second, cite always.
+async function answer(question: string) {
+  const context = await retrieve(question); // your data, not the model's memory
+  const reply = await model.complete({ question, context });
+  return { reply, sources: context.map((c) => c.url) };
+}
+```
+
+The model is the easy part now. The craft is in everything around it: what you feed it, how fast it responds, and knowing when to keep it silent.

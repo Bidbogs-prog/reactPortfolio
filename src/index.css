@@ -3,8 +3,11 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    /* Ink & Lime, dark editorial-engineering theme */
+  /* ============================================================
+     ENGINEER register — Ink & Lime, mono, structured (default)
+     ============================================================ */
+  :root,
+  [data-register="engineer"] {
     --background: 240 10% 5%;
     --foreground: 60 9% 92%;
 
@@ -39,6 +42,60 @@
     --font-display: "Bricolage Grotesque", "Hanken Grotesk", sans-serif;
     --font-sans: "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
     --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+    /* Per-register feel */
+    --grid-opacity: 0.04;
+    --tracking-body: -0.01em;
+    --leading-body: 1.65;
+  }
+
+  /* ============================================================
+     POET register — warm ink, serif, airy
+     ============================================================ */
+  [data-register="poet"] {
+    --background: 26 16% 6%;
+    --foreground: 36 30% 90%;
+
+    --card: 26 14% 9%;
+    --card-foreground: 36 30% 90%;
+
+    --popover: 26 16% 7%;
+    --popover-foreground: 36 30% 90%;
+
+    /* Accent = warm amber/rose */
+    --primary: 24 86% 67%;
+    --primary-foreground: 26 30% 8%;
+
+    --secondary: 26 12% 14%;
+    --secondary-foreground: 36 30% 90%;
+
+    --muted: 26 12% 13%;
+    --muted-foreground: 32 14% 62%;
+
+    --accent: 24 86% 67%;
+    --accent-foreground: 26 30% 8%;
+
+    --destructive: 0 72% 56%;
+    --destructive-foreground: 36 30% 96%;
+
+    --border: 30 12% 18%;
+    --input: 30 12% 18%;
+    --ring: 24 86% 67%;
+
+    --radius: 0.5rem;
+
+    --font-display: "Fraunces", "Newsreader", Georgia, serif;
+    --font-sans: "Newsreader", Georgia, "Hanken Grotesk", serif;
+    --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+    --grid-opacity: 0.025;
+    --tracking-body: 0.005em;
+    --leading-body: 1.8;
+  }
+
+  /* Smoothly cross-fade the two skins on the register flip. */
+  html {
+    transition: background-color 0.6s ease, color 0.6s ease;
   }
 }
 
@@ -57,6 +114,7 @@
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
     font-feature-settings: "ss01", "cv01";
+    letter-spacing: var(--tracking-body);
     overflow-x: hidden;
   }
 
@@ -123,10 +181,14 @@
   .bg-grid {
     background-image: linear-gradient(
         to right,
-        hsl(240 6% 100% / 0.04) 1px,
+        hsl(0 0% 100% / var(--grid-opacity, 0.04)) 1px,
         transparent 1px
       ),
-      linear-gradient(to bottom, hsl(240 6% 100% / 0.04) 1px, transparent 1px);
+      linear-gradient(
+        to bottom,
+        hsl(0 0% 100% / var(--grid-opacity, 0.04)) 1px,
+        transparent 1px
+      );
     background-size: 56px 56px;
   }
 
@@ -191,4 +253,215 @@
     opacity: 1;
     transform: none;
   }
+  .poem-line {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+@keyframes dotPulse {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ============================================================
+   Writings — article prose (code) and poem (verse) layouts
+   ============================================================ */
+.prose-hc {
+  font-size: 1.0625rem;
+  line-height: var(--leading-body, 1.7);
+  color: hsl(var(--muted-foreground));
+}
+.prose-hc > * + * {
+  margin-top: 1.4em;
+}
+.prose-hc h2,
+.prose-hc h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: hsl(var(--foreground));
+  margin-top: 2.2em;
+}
+.prose-hc h2 {
+  font-size: 1.6rem;
+}
+.prose-hc h3 {
+  font-size: 1.3rem;
+}
+.prose-hc strong {
+  color: hsl(var(--foreground));
+  font-weight: 600;
+}
+.prose-hc a {
+  color: hsl(var(--primary));
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.prose-hc ul,
+.prose-hc ol {
+  padding-left: 1.4em;
+}
+.prose-hc ul {
+  list-style: none;
+}
+.prose-hc ul > li {
+  position: relative;
+}
+.prose-hc ul > li::before {
+  content: "—";
+  position: absolute;
+  left: -1.4em;
+  color: hsl(var(--primary));
+}
+.prose-hc ol {
+  list-style: decimal;
+}
+.prose-hc li + li {
+  margin-top: 0.5em;
+}
+.prose-hc li::marker {
+  color: hsl(var(--primary));
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+}
+.prose-hc blockquote {
+  border-left: 2px solid hsl(var(--primary));
+  padding-left: 1.2em;
+  font-style: italic;
+  color: hsl(var(--foreground));
+}
+.prose-hc :not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: hsl(var(--secondary));
+  border: 1px solid hsl(var(--border));
+  border-radius: 4px;
+  padding: 0.15em 0.4em;
+  color: hsl(var(--foreground));
+}
+.prose-hc pre {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: 1px solid hsl(var(--border));
+  background: hsl(240 12% 4%);
+  padding: 1.15rem 1.25rem;
+  font-size: 0.85rem;
+  line-height: 1.7;
+}
+.prose-hc pre code {
+  font-family: var(--font-mono);
+  background: none;
+  border: none;
+  padding: 0;
+  color: hsl(var(--foreground));
+}
+
+/* Short-story / prose layout — literary serif column, no animation */
+.prose-story {
+  font-family: "Newsreader", "Fraunces", Georgia, serif;
+  font-size: 1.2rem;
+  line-height: 1.85;
+  color: hsl(var(--foreground) / 0.92);
+  max-width: 40rem;
+  margin-inline: auto;
+}
+.prose-story > p + p {
+  margin-top: 1.5em;
+}
+.prose-story > p:first-of-type::first-letter {
+  float: left;
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 3.4em;
+  line-height: 0.82;
+  padding: 0.05em 0.12em 0 0;
+  color: hsl(var(--primary));
+}
+.prose-story em {
+  font-style: italic;
+}
+.prose-story strong {
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
+
+/* Poem layout */
+.poem {
+  font-family: "Fraunces", "Newsreader", Georgia, serif;
+  font-size: 1.2rem;
+  line-height: 1.95;
+  color: hsl(var(--foreground));
+  text-align: left;
+}
+.poem p {
+  margin-bottom: 2rem;
+}
+.poem p:last-child {
+  margin-bottom: 0;
+}
+.poem hr {
+  border: none;
+  height: 1px;
+  width: 3rem;
+  margin: 2.75rem auto;
+  background: hsl(var(--primary) / 0.6);
+}
+
+/* Each line reveals once as it scrolls into the reading band. */
+.poem-line {
+  display: block;
+  opacity: 0;
+  transform: translateY(14px);
+  filter: blur(7px);
+  transition: opacity 0.75s ease, transform 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.75s ease;
+  will-change: opacity, transform, filter;
+}
+.poem-line.is-lit {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  will-change: auto;
+}
+
+/* highlight.js tokens — tuned to the ink & lime palette */
+.hljs-comment,
+.hljs-quote {
+  color: hsl(240 5% 45%);
+  font-style: italic;
+}
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-built_in,
+.hljs-literal {
+  color: hsl(var(--primary));
+}
+.hljs-string,
+.hljs-attr,
+.hljs-template-tag {
+  color: hsl(150 50% 62%);
+}
+.hljs-title,
+.hljs-title.function_,
+.hljs-section {
+  color: hsl(45 90% 66%);
+}
+.hljs-number,
+.hljs-symbol {
+  color: hsl(20 85% 66%);
+}
+.hljs-variable,
+.hljs-name,
+.hljs-params {
+  color: hsl(var(--foreground));
 }

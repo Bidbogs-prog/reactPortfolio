@@ -14,10 +14,15 @@ export default {
       },
     },
     extend: {
+      transitionTimingFunction: {
+        fluid: "cubic-bezier(0.22, 1, 0.36, 1)",
+      },
       fontFamily: {
-        sans: ["Hanken Grotesk", "ui-sans-serif", "system-ui", "sans-serif"],
-        display: ["Bricolage Grotesque", "Hanken Grotesk", "sans-serif"],
-        mono: ["JetBrains Mono", "ui-monospace", "monospace"],
+        sans: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
+        display: ["var(--font-display)", "sans-serif"],
+        mono: ["var(--font-mono)", "ui-monospace", "monospace"],
+        grotesk: ["Bricolage Grotesque", "Hanken Grotesk", "sans-serif"],
+        serif: ["Fraunces", "Newsreader", "Georgia", "serif"],
       },
       animation: {
         blink: "blink 1.1s step-end infinite",
