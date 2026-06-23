@@ -260,6 +260,12 @@
   }
 }
 
+/* Characters still being decoded by the headline scramble (GSAP). */
+.scramble-char {
+  color: hsl(var(--primary));
+  opacity: 0.5;
+}
+
 @keyframes dotPulse {
   0%,
   100% {

@@ -3,14 +3,14 @@ import { Button } from "@/components/ui/button";
 import { socials } from "@/data/socials";
 import { useRegister } from "@/lib/register";
 import { useAgent } from "@/lib/agent/agent-provider";
-import { useScramble } from "@/lib/hooks/use-scramble";
+import { ScrambleHeadline } from "@/components/scramble-headline";
 import { AmbientField } from "@/components/ambient-field";
 import { ArrowUpRight, ArrowDown, Sparkles } from "lucide-react";
 
 const COPY = {
   engineer: {
     eyebrow: "Full-Stack & AI Engineer, Morocco",
-    headline: "I build thoughtful software for the web.",
+    headline: "I build software, thoughtfully.",
     intro:
       "I'm Haytham Chhilif, a self-taught developer who turns ideas into fast, polished products. Lately I'm weaving AI into full-stack apps that feel genuinely useful.",
     focus: ["Full-Stack Development", "AI Integration", "Product Engineering"],
@@ -28,7 +28,6 @@ export default function HeroSection() {
   const { register } = useRegister();
   const { openPalette } = useAgent();
   const copy = COPY[register];
-  const headline = useScramble(copy.headline);
 
   const scrollTo = (id: string) =>
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
@@ -58,7 +57,7 @@ export default function HeroSection() {
             style={{ animation: "fadeUp 0.8s 0.15s cubic-bezier(.22,1,.36,1) forwards" }}
             aria-label={copy.headline}
           >
-            <span aria-hidden="true">{headline}</span>
+            <ScrambleHeadline text={copy.headline} />
           </h1>
 
           <p
