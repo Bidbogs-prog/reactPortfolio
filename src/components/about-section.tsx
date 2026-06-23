@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { SectionHeading } from "@/components/section-heading";
 import { Reveal } from "@/components/reveal";
@@ -22,7 +23,6 @@ export default function AboutSection() {
   const isPoet = register === "poet";
 
   const facts = isPoet ? POET_FACTS : ENGINEER_FACTS;
-  const groups = isPoet ? interestGroups : skillGroups;
 
   return (
     <section id="about" className="relative border-t border-border/60 py-24 md:py-32">
@@ -57,30 +57,64 @@ export default function AboutSection() {
 
           {/* Skills / interests */}
           <div className="space-y-8">
-            {groups.map((group, i) => (
-              <Reveal key={group.label} delay={i * 80}>
-                <div>
-                  <h3 className="mb-3 flex items-center gap-2 font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                    <span className="text-primary">&#47;&#47;</span>
-                    {group.label}
-                  </h3>
-                  <ul className="flex flex-wrap gap-2">
-                    {group.items.map((item) => (
-                      <li
-                        key={item}
-                        className="rounded-full border border-border bg-card px-3 py-1.5 text-sm text-foreground/90 transition-colors hover:border-primary/50 hover:text-primary"
-                      >
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </Reveal>
-            ))}
+            {isPoet
+              ? interestGroups.map((group, i) => (
+                  <Reveal key={group.label} delay={i * 80}>
+                    <div>
+                      <GroupLabel>{group.label}</GroupLabel>
+                      {group.subgroups ? (
+                        <div className="space-y-4">
+                          {group.subgroups.map((sub) => (
+                            <div key={sub.label}>
+                              <p className="mb-2 font-mono text-[0.65rem] uppercase tracking-wider text-muted-foreground/60">
+                                {sub.label}
+                              </p>
+                              <Chips items={sub.items} />
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <Chips items={group.items ?? []} />
+                      )}
+                    </div>
+                  </Reveal>
+                ))
+              : skillGroups.map((group, i) => (
+                  <Reveal key={group.label} delay={i * 80}>
+                    <div>
+                      <GroupLabel>{group.label}</GroupLabel>
+                      <Chips items={group.items} />
+                    </div>
+                  </Reveal>
+                ))}
           </div>
         </div>
       </div>
     </section>
+  );
+}
+
+function GroupLabel({ children }: { children: ReactNode }) {
+  return (
+    <h3 className="mb-3 flex items-center gap-2 font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">
+      <span className="text-primary">&#47;&#47;</span>
+      {children}
+    </h3>
+  );
+}
+
+function Chips({ items }: { items: string[] }) {
+  return (
+    <ul className="flex flex-wrap gap-2">
+      {items.map((item) => (
+        <li
+          key={item}
+          className="rounded-full border border-border bg-card px-3 py-1.5 text-sm text-foreground/90 transition-colors hover:border-primary/50 hover:text-primary"
+        >
+          {item}
+        </li>
+      ))}
+    </ul>
   );
 }
 
