@@ -5,6 +5,25 @@ import { Reveal } from "@/components/reveal";
 import { KindIcon } from "@/components/kind-icon";
 import { cn } from "@/lib/utils";
 import { ArrowUpRight } from "lucide-react";
+import { Seo, SITE_URL, SITE_NAME } from "@/components/seo";
+
+const WRITINGS_DESCRIPTION =
+  "Two streams from the same desk: things I've learned building software, and the occasional poem that escapes the terminal.";
+
+const blogLd = {
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  name: `Writings — ${SITE_NAME}`,
+  description: WRITINGS_DESCRIPTION,
+  url: `${SITE_URL}/writings`,
+  author: { "@type": "Person", name: SITE_NAME, url: SITE_URL },
+  blogPost: writings.map((w) => ({
+    "@type": "BlogPosting",
+    headline: w.title,
+    datePublished: w.date,
+    url: `${SITE_URL}/writings/${w.slug}`,
+  })),
+};
 
 type Filter = "all" | WritingKind;
 
@@ -25,6 +44,12 @@ export default function WritingsPage() {
 
   return (
     <section className="relative min-h-screen pt-32 pb-24">
+      <Seo
+        title={`Writings — ${SITE_NAME}`}
+        description={WRITINGS_DESCRIPTION}
+        path="/writings"
+        jsonLd={blogLd}
+      />
       <div className="pointer-events-none absolute inset-0 bg-grid [mask-image:radial-gradient(60%_40%_at_50%_0%,black,transparent)]" />
       <div className="container relative">
         <Reveal>

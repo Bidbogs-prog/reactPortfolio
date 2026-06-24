@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { ArrowLeft } from "lucide-react";
 import { VerseReader } from "@/components/verse-reader";
 import NotFoundPage from "@/pages/not-found";
+import { Seo, SITE_URL, SITE_NAME } from "@/components/seo";
 
 export default function WritingPostPage() {
   const { slug } = useParams();
@@ -11,12 +12,36 @@ export default function WritingPostPage() {
 
   if (!writing) return <NotFoundPage />;
 
-  const { Component, title, date, kind, tags } = writing;
+  const { Component, title, date, kind, tags, summary } = writing;
   const isVerse = kind === "verse";
   const isProse = kind === "prose";
 
+  const url = `${SITE_URL}/writings/${writing.slug}`;
+  const articleLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: title,
+    description: summary,
+    datePublished: date,
+    dateModified: date,
+    url,
+    mainEntityOfPage: { "@type": "WebPage", "@id": url },
+    author: { "@type": "Person", name: SITE_NAME, url: SITE_URL },
+    publisher: { "@type": "Person", name: SITE_NAME, url: SITE_URL },
+    ...(tags && tags.length > 0 ? { keywords: tags.join(", ") } : {}),
+  };
+
   return (
     <article className="relative min-h-screen pt-32 pb-28">
+      <Seo
+        title={`${title} — ${SITE_NAME}`}
+        description={summary}
+        path={`/writings/${writing.slug}`}
+        type="article"
+        publishedTime={date}
+        tags={tags}
+        jsonLd={articleLd}
+      />
       <div className="container relative max-w-3xl">
         <Link
           to="/writings"

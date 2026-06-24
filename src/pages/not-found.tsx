@@ -1,8 +1,15 @@
 import { Link } from "react-router-dom";
+import { Seo, SITE_NAME } from "@/components/seo";
 
 export default function NotFoundPage() {
   return (
     <section className="flex min-h-screen flex-col items-center justify-center px-4 text-center">
+      <Seo
+        title={`Page not found — ${SITE_NAME}`}
+        description="This page wandered off, or never existed."
+        path="/404"
+        noindex
+      />
       <p className="font-mono text-sm uppercase tracking-[0.3em] text-primary">
         404
       </p>

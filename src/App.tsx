@@ -1,12 +1,10 @@
 import { useEffect } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
+import { RegisterProvider } from "@/lib/register";
+import { AgentProvider } from "@/lib/agent/agent-provider";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { CommandPalette } from "@/components/command-palette";
-import HomePage from "@/pages/home";
-import WritingsPage from "@/pages/writings";
-import WritingPostPage from "@/pages/writing-post";
-import NotFoundPage from "@/pages/not-found";
 
 /** Scroll to top on route change, or to a hash target if present. */
 function ScrollManager() {
@@ -26,30 +24,30 @@ function ScrollManager() {
   return null;
 }
 
+/** Root layout shared by every route — providers, chrome, and the page outlet. */
 export default function App() {
   return (
-    <div className="grain relative min-h-screen">
-      <a
-        href="#main"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground"
-      >
-        Skip to content
-      </a>
+    <RegisterProvider>
+      <AgentProvider>
+        <div className="grain relative min-h-screen">
+          <a
+            href="#main"
+            className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground"
+          >
+            Skip to content
+          </a>
 
-      <ScrollManager />
-      <Navbar />
+          <ScrollManager />
+          <Navbar />
 
-      <main id="main">
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/writings" element={<WritingsPage />} />
-          <Route path="/writings/:slug" element={<WritingPostPage />} />
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </main>
+          <main id="main">
+            <Outlet />
+          </main>
 
-      <Footer />
-      <CommandPalette />
-    </div>
+          <Footer />
+          <CommandPalette />
+        </div>
+      </AgentProvider>
+    </RegisterProvider>
   );
 }
