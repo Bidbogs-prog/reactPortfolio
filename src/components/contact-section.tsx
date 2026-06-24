@@ -77,7 +77,7 @@ export default function ContactSection() {
       />
       <div className="container relative">
         <SectionHeading
-          num="03"
+          num="04"
           eyebrow="Contact"
           title="Let's build something"
         />

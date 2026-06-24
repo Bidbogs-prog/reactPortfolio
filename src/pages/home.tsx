@@ -1,6 +1,7 @@
 import HeroSection from "@/components/hero-section";
 import AboutSection from "@/components/about-section";
 import ProjectsSection from "@/components/projects-section";
+import ContributionsSection from "@/components/contributions-section";
 import ContactSection from "@/components/contact-section";
 import { Seo, SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE } from "@/components/seo";
 import { socials } from "@/data/socials";
@@ -33,6 +34,7 @@ export default function HomePage() {
       <HeroSection />
       <AboutSection />
       <ProjectsSection />
+      <ContributionsSection />
       <ContactSection />
     </>
   );

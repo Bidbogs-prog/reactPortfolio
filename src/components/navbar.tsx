@@ -9,10 +9,11 @@ import { cn } from "@/lib/utils";
 const SECTION_LINKS = [
   { id: "about", label: "About", num: "01" },
   { id: "work", label: "Work", num: "02" },
-  { id: "contact", label: "Contact", num: "03" },
+  { id: "contributions", label: "Contributed", num: "03" },
+  { id: "contact", label: "Contact", num: "04" },
 ];
 
-const HOME_SECTION_IDS = ["hero", "about", "work", "contact"];
+const HOME_SECTION_IDS = ["hero", "about", "work", "contributions", "contact"];
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
