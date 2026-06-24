@@ -114,15 +114,13 @@ export default function Navbar() {
           </div>
 
           <Button
-            asChild
             size="sm"
             variant="outline"
             className="border-primary/40 font-mono text-xs hover:bg-primary hover:text-primary-foreground"
+            onClick={() => goToSection("contact")}
           >
-            <a href="mailto:haythamchhilif@gmail.com">
-              Let&apos;s talk
-              <ArrowUpRight className="h-4 w-4" />
-            </a>
+            Let&apos;s talk
+            <ArrowUpRight className="h-4 w-4" />
           </Button>
         </div>
 
@@ -163,13 +161,13 @@ export default function Navbar() {
                   </Link>
                 </SheetTrigger>
                 <SheetTrigger asChild>
-                  <a
-                    href="mailto:haythamchhilif@gmail.com"
+                  <button
+                    onClick={() => goToSection("contact")}
                     className="mt-4 flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 font-mono text-sm font-medium text-primary-foreground"
                   >
                     Let&apos;s talk
                     <ArrowUpRight className="h-4 w-4" />
-                  </a>
+                  </button>
                 </SheetTrigger>
               </div>
             </SheetContent>

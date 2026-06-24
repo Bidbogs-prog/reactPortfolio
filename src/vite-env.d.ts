@@ -12,7 +12,6 @@ declare module "*.mdx" {
 }
 
 interface ImportMetaEnv {
-  readonly VITE_DISCORD_URL?: string;
   /** Optional: set when a real agent backend endpoint is wired up. */
   readonly VITE_AGENT_URL?: string;
 }
