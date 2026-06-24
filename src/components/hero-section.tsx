@@ -42,7 +42,7 @@ export default function HeroSection() {
       <div className="pointer-events-none absolute inset-0 bg-glow" />
       <div className="pointer-events-none absolute -right-32 top-1/4 h-[28rem] w-[28rem] rounded-full bg-primary/10 blur-[120px]" />
 
-      <div className="container relative z-10 pt-28">
+      <div className="container relative z-10 pt-28 pb-32 md:pb-36">
         <div className="max-w-4xl">
           <p
             className="eyebrow mb-6 flex items-center gap-3 opacity-0"
@@ -116,7 +116,7 @@ export default function HeroSection() {
           </div>
 
           <div
-            className="mt-16 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-border/60 pt-6 opacity-0"
+            className="mt-16 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-border/60 pt-9 opacity-0"
             style={{ animation: "fadeUp 0.8s 0.6s cubic-bezier(.22,1,.36,1) forwards" }}
           >
             {copy.focus.map((role) => (
