@@ -1,10 +1,16 @@
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { RegisterProvider } from "@/lib/register";
 import { AgentProvider } from "@/lib/agent/agent-provider";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
-import { CommandPalette } from "@/components/command-palette";
+
+// Lazy — it's a closed overlay on load, so it shouldn't ship in the initial JS.
+const CommandPalette = lazy(() =>
+  import("@/components/command-palette").then((m) => ({
+    default: m.CommandPalette,
+  }))
+);
 
 /** Scroll to top on route change, or to a hash target if present. */
 function ScrollManager() {
@@ -45,7 +51,9 @@ export default function App() {
           </main>
 
           <Footer />
-          <CommandPalette />
+          <Suspense fallback={null}>
+            <CommandPalette />
+          </Suspense>
         </div>
       </AgentProvider>
     </RegisterProvider>

@@ -45,16 +45,16 @@ export default function HeroSection() {
       <div className="container relative z-10 pt-28 pb-32 md:pb-36">
         <div className="max-w-4xl">
           <p
-            className="eyebrow mb-6 flex items-center gap-3 opacity-0"
-            style={{ animation: "fadeUp 0.7s 0.05s cubic-bezier(.22,1,.36,1) forwards" }}
+            className="eyebrow mb-6 flex items-center gap-3"
+            style={{ animation: "riseUp 0.7s 0.05s cubic-bezier(.22,1,.36,1) forwards" }}
           >
             <span className="inline-block h-px w-8 bg-primary/60" />
             {copy.eyebrow}
           </p>
 
           <h1
-            className="display text-balance text-5xl leading-[0.95] text-foreground sm:text-6xl md:text-7xl lg:text-8xl opacity-0"
-            style={{ animation: "fadeUp 0.8s 0.15s cubic-bezier(.22,1,.36,1) forwards" }}
+            className="display text-balance text-5xl leading-[0.95] text-foreground sm:text-6xl md:text-7xl lg:text-8xl"
+            style={{ animation: "riseUp 0.8s 0.15s cubic-bezier(.22,1,.36,1) forwards" }}
             aria-label={copy.headline}
           >
             <ScrambleHeadline text={copy.headline} />
@@ -62,8 +62,8 @@ export default function HeroSection() {
 
           <p
             key={register}
-            className="mt-8 max-w-xl text-pretty text-base leading-relaxed text-muted-foreground md:text-lg opacity-0"
-            style={{ animation: "fadeUp 0.8s 0.3s cubic-bezier(.22,1,.36,1) forwards" }}
+            className="mt-8 max-w-xl text-pretty text-base leading-relaxed text-muted-foreground md:text-lg"
+            style={{ animation: "riseUp 0.8s 0.3s cubic-bezier(.22,1,.36,1) forwards" }}
           >
             {copy.intro}
           </p>
@@ -71,8 +71,8 @@ export default function HeroSection() {
           {/* Command bar — the agent's front door */}
           <button
             onClick={openPalette}
-            className="group mt-9 flex w-full max-w-md items-center gap-3 rounded-xl border border-border bg-card/60 px-4 py-3.5 text-left backdrop-blur-sm transition-colors hover:border-primary/50 opacity-0"
-            style={{ animation: "fadeUp 0.8s 0.4s cubic-bezier(.22,1,.36,1) forwards" }}
+            className="group mt-9 flex w-full max-w-md items-center gap-3 rounded-xl border border-border bg-card/60 px-4 py-3.5 text-left backdrop-blur-sm transition-colors hover:border-primary/50"
+            style={{ animation: "riseUp 0.8s 0.4s cubic-bezier(.22,1,.36,1) forwards" }}
           >
             <Sparkles className="h-4 w-4 shrink-0 text-primary" />
             <span className="flex-1 font-mono text-sm text-muted-foreground">
@@ -84,8 +84,8 @@ export default function HeroSection() {
           </button>
 
           <div
-            className="mt-9 flex flex-wrap items-center gap-4 opacity-0"
-            style={{ animation: "fadeUp 0.8s 0.5s cubic-bezier(.22,1,.36,1) forwards" }}
+            className="mt-9 flex flex-wrap items-center gap-4"
+            style={{ animation: "riseUp 0.8s 0.5s cubic-bezier(.22,1,.36,1) forwards" }}
           >
             <Button
               size="lg"
@@ -116,8 +116,8 @@ export default function HeroSection() {
           </div>
 
           <div
-            className="mt-16 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-border/60 pt-9 opacity-0"
-            style={{ animation: "fadeUp 0.8s 0.6s cubic-bezier(.22,1,.36,1) forwards" }}
+            className="mt-16 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-border/60 pt-9"
+            style={{ animation: "riseUp 0.8s 0.6s cubic-bezier(.22,1,.36,1) forwards" }}
           >
             {copy.focus.map((role) => (
               <span
@@ -141,9 +141,9 @@ export default function HeroSection() {
       </button>
 
       <style>{`
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(24px); }
-          to { opacity: 1; transform: translateY(0); }
+        @keyframes riseUp {
+          from { transform: translateY(18px); }
+          to { transform: translateY(0); }
         }
       `}</style>
     </section>
