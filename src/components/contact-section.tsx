@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { SectionHeading } from "@/components/section-heading";
 import { Reveal } from "@/components/reveal";
 import { socials } from "@/data/socials";
+import { useRegister } from "@/lib/register";
 import { Mail, MapPin, Send, CheckCircle2, AlertCircle } from "lucide-react";
 
 type Status = { type: "success" | "error" | null; message: string };
@@ -15,6 +16,7 @@ type Status = { type: "success" | "error" | null; message: string };
 const initialForm = { name: "", email: "", message: "" };
 
 export default function ContactSection() {
+  const { register } = useRegister();
   const [formData, setFormData] = useState(initialForm);
   const [status, setStatus] = useState<Status>({ type: null, message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -67,7 +69,7 @@ export default function ContactSection() {
       />
       <div className="container relative">
         <SectionHeading
-          num="04"
+          num={register === "poet" ? "03" : "04"}
           eyebrow="Contact"
           title="Let's build something"
         />

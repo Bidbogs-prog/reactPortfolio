@@ -5,7 +5,7 @@ export const SITE_URL = "https://bidbogs.com";
 export const SITE_NAME = "Haytham Chhilif";
 export const TWITTER_HANDLE = "@HaythamChhilif";
 export const DEFAULT_DESCRIPTION =
-  "Haytham Chhilif is a full-stack developer specializing in AI-driven web applications, building fast, thoughtful products with React, Next.js, Node, and modern AI tooling.";
+  "Haytham Chhilif is a full-stack and AI engineer building fast, thoughtful web apps with React, Next.js, and modern AI tooling.";
 /** 1200x630 social card. Lives in /public. */
 export const DEFAULT_OG_IMAGE = "/og.png";
 
@@ -52,11 +52,19 @@ export function Seo({
       <title>{title}</title>
       <meta name="description" content={description} />
       <link rel="canonical" href={url} />
-      {noindex ? <meta name="robots" content="noindex, follow" /> : null}
+      <meta
+        name="robots"
+        content={
+          noindex
+            ? "noindex, follow"
+            : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+        }
+      />
 
       {/* Open Graph */}
       <meta property="og:type" content={type} />
       <meta property="og:site_name" content={SITE_NAME} />
+      <meta property="og:locale" content="en_US" />
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
       <meta property="og:url" content={url} />
@@ -66,6 +74,7 @@ export function Seo({
 
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:site" content={TWITTER_HANDLE} />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={img} />
@@ -81,7 +90,6 @@ export function Seo({
         : null}
 
       {blocks.map((block, i) => (
-        // eslint-disable-next-line react/no-danger
         <script type="application/ld+json" key={i}>
           {JSON.stringify(block)}
         </script>

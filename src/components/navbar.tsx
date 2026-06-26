@@ -4,23 +4,32 @@ import { Button } from "@/components/ui/button";
 import { Menu, ArrowUpRight, Feather } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { RegisterToggle } from "@/components/register-toggle";
+import { useRegister } from "@/lib/register";
 import { cn } from "@/lib/utils";
 
-const SECTION_LINKS = [
+const ENGINEER_LINKS = [
   { id: "about", label: "About", num: "01" },
   { id: "work", label: "Work", num: "02" },
   { id: "contributions", label: "Contributed", num: "03" },
   { id: "contact", label: "Contact", num: "04" },
 ];
 
-const HOME_SECTION_IDS = ["hero", "about", "work", "contributions", "contact"];
+// The poet side has no "Contributed" section, so Contact moves up to 03.
+const POET_LINKS = [
+  { id: "about", label: "About", num: "01" },
+  { id: "work", label: "Work", num: "02" },
+  { id: "contact", label: "Contact", num: "03" },
+];
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [active, setActive] = useState("hero");
   const location = useLocation();
   const navigate = useNavigate();
+  const { register } = useRegister();
   const isHome = location.pathname === "/";
+
+  const sectionLinks = register === "poet" ? POET_LINKS : ENGINEER_LINKS;
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 12);
@@ -31,6 +40,7 @@ export default function Navbar() {
 
   useEffect(() => {
     if (!isHome) return;
+    const ids = ["hero", ...sectionLinks.map((l) => l.id)];
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -39,12 +49,12 @@ export default function Navbar() {
       },
       { rootMargin: "-45% 0px -50% 0px" }
     );
-    HOME_SECTION_IDS.forEach((id) => {
+    ids.forEach((id) => {
       const el = document.getElementById(id);
       if (el) observer.observe(el);
     });
     return () => observer.disconnect();
-  }, [isHome]);
+  }, [isHome, register]);
 
   const goToSection = (id: string) => {
     if (isHome) {
@@ -79,7 +89,7 @@ export default function Navbar() {
 
         {/* Desktop */}
         <div className="hidden items-center gap-1 md:flex">
-          {SECTION_LINKS.map((link) => (
+          {sectionLinks.map((link) => (
             <button
               key={link.id}
               onClick={() => goToSection(link.id)}
@@ -138,7 +148,7 @@ export default function Navbar() {
               className="border-border bg-card/95 backdrop-blur-xl"
             >
               <div className="mt-12 flex flex-col gap-2">
-                {SECTION_LINKS.map((link) => (
+                {sectionLinks.map((link) => (
                   <SheetTrigger asChild key={link.id}>
                     <button
                       onClick={() => goToSection(link.id)}

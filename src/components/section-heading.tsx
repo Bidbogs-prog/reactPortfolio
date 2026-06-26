@@ -1,7 +1,7 @@
 import { Reveal } from "@/components/reveal";
 
 interface SectionHeadingProps {
-  num: string;
+  num?: string;
   eyebrow: string;
   title: string;
 }
@@ -11,7 +11,7 @@ export function SectionHeading({ num, eyebrow, title }: SectionHeadingProps) {
     <Reveal>
       <div className="mb-12 flex flex-col gap-4 md:mb-16">
         <span className="eyebrow flex items-center gap-3">
-          <span className="text-muted-foreground/50">{num}</span>
+          {num ? <span className="text-muted-foreground/50">{num}</span> : null}
           <span className="inline-block h-px w-8 bg-primary/50" />
           {eyebrow}
         </span>

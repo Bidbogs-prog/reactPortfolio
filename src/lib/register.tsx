@@ -20,6 +20,21 @@ const RegisterContext = createContext<RegisterContextValue | null>(null);
 
 const STORAGE_KEY = "hc-register";
 
+// Poet-only serifs aren't in the initial document; fetch them the first time
+// the reader switches to poet mode so they never weigh down first paint.
+const POET_FONTS_HREF =
+  "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap";
+
+function loadPoetFonts() {
+  if (typeof document === "undefined") return;
+  if (document.getElementById("poet-fonts")) return;
+  const link = document.createElement("link");
+  link.id = "poet-fonts";
+  link.rel = "stylesheet";
+  link.href = POET_FONTS_HREF;
+  document.head.appendChild(link);
+}
+
 function getInitial(): Register {
   if (typeof window === "undefined") return "engineer";
   const stored = window.localStorage.getItem(STORAGE_KEY);
@@ -34,6 +49,7 @@ export function RegisterProvider({ children }: { children: ReactNode }) {
     const root = document.documentElement;
     root.dataset.register = register;
     window.localStorage.setItem(STORAGE_KEY, register);
+    if (register === "poet") loadPoetFonts();
   }, [register]);
 
   const setRegister = useCallback((r: Register) => setRegisterState(r), []);

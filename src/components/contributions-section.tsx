@@ -1,6 +1,7 @@
 import { SectionHeading } from "@/components/section-heading";
 import { Reveal } from "@/components/reveal";
 import { contributions } from "@/data/contributions";
+import { useRegister } from "@/lib/register";
 import { ArrowUpRight } from "lucide-react";
 
 function hostOf(url: string): string {
@@ -12,6 +13,11 @@ function hostOf(url: string): string {
 }
 
 export default function ContributionsSection() {
+  const { register } = useRegister();
+
+  // Professional web collaborations belong to the engineer side only.
+  if (register === "poet") return null;
+
   return (
     <section
       id="contributions"

@@ -25,10 +25,27 @@ export default function WritingPostPage() {
     datePublished: date,
     dateModified: date,
     url,
+    image: `${SITE_URL}/og.png`,
+    inLanguage: "en",
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
     author: { "@type": "Person", name: SITE_NAME, url: SITE_URL },
     publisher: { "@type": "Person", name: SITE_NAME, url: SITE_URL },
     ...(tags && tags.length > 0 ? { keywords: tags.join(", ") } : {}),
+  };
+
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Writings",
+        item: `${SITE_URL}/writings`,
+      },
+      { "@type": "ListItem", position: 3, name: title, item: url },
+    ],
   };
 
   return (
@@ -40,7 +57,7 @@ export default function WritingPostPage() {
         type="article"
         publishedTime={date}
         tags={tags}
-        jsonLd={articleLd}
+        jsonLd={[articleLd, breadcrumbLd]}
       />
       <div className="container relative max-w-3xl">
         <Link
