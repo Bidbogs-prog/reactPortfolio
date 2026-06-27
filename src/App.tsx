@@ -1,7 +1,7 @@
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { RegisterProvider } from "@/lib/register";
-import { AgentProvider } from "@/lib/agent/agent-provider";
+import { AgentProvider, useAgent } from "@/lib/agent/agent-provider";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 
@@ -11,6 +11,24 @@ const CommandPalette = lazy(() =>
     default: m.CommandPalette,
   }))
 );
+
+/**
+ * Mounts the command palette only after it's first opened, so its chunk loads
+ * on demand instead of competing on the initial-load critical path.
+ */
+function CommandPaletteHost() {
+  const { open } = useAgent();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    if (open) setMounted(true);
+  }, [open]);
+  if (!mounted) return null;
+  return (
+    <Suspense fallback={null}>
+      <CommandPalette />
+    </Suspense>
+  );
+}
 
 /** Scroll to top on route change, or to a hash target if present. */
 function ScrollManager() {
@@ -51,9 +69,7 @@ export default function App() {
           </main>
 
           <Footer />
-          <Suspense fallback={null}>
-            <CommandPalette />
-          </Suspense>
+          <CommandPaletteHost />
         </div>
       </AgentProvider>
     </RegisterProvider>
