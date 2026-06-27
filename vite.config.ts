@@ -127,6 +127,48 @@ ${writingsList}
   console.log(`✓ llms.txt written with ${posts.length} writings`);
 }
 
+/**
+ * Inline the (small) built CSS into every prerendered HTML file and drop the
+ * render-blocking <link>. Removes a critical-path round-trip on mobile.
+ */
+function inlineCss() {
+  const dist = path.resolve(__dirname, OUT_DIR);
+  const assetsDir = path.join(dist, "assets");
+  const cssByHref = new Map<string, string>();
+  for (const f of fs.readdirSync(assetsDir).filter((n) => n.endsWith(".css"))) {
+    cssByHref.set(`/assets/${f}`, fs.readFileSync(path.join(assetsDir, f), "utf8"));
+  }
+
+  const htmlFiles: string[] = [];
+  (function walk(dir: string) {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      const p = path.join(dir, e.name);
+      if (e.isDirectory()) walk(p);
+      else if (e.name.endsWith(".html")) htmlFiles.push(p);
+    }
+  })(dist);
+
+  const linkRe =
+    /<link\b[^>]*rel="stylesheet"[^>]*href="(\/assets\/[^"]+\.css)"[^>]*>/g;
+  let count = 0;
+  for (const file of htmlFiles) {
+    const html = fs.readFileSync(file, "utf8");
+    let changed = false;
+    const out = html.replace(linkRe, (m, href: string) => {
+      const css = cssByHref.get(href);
+      if (!css) return m;
+      changed = true;
+      return `<style>${css}</style>`;
+    });
+    if (changed) {
+      fs.writeFileSync(file, out);
+      count++;
+    }
+  }
+  // eslint-disable-next-line no-console
+  console.log(`✓ inlined CSS into ${count} HTML files`);
+}
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
@@ -154,6 +196,7 @@ export default defineConfig({
     onFinished: () => {
       generateSitemap();
       generateLlmsTxt();
+      inlineCss();
     },
   },
 });
