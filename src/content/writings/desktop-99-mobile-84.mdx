@@ -2,27 +2,25 @@
 title: "Desktop 99, mobile 84: debugging a slow Lighthouse score"
 date: "2026-06-24"
 kind: "code"
-summary: "Same site, same deploy — flying on desktop, stalling on mobile. A walk through the handful of changes that closed the gap, and the ones I chose not to make."
+summary: "Same site, same deploy: fast on desktop, sluggish on mobile. Here's how I closed the gap, and the fixes I deliberately skipped."
 tags: ["Performance", "Lighthouse", "Web"]
 ---
 
-My portfolio scored 99 on desktop and 84 on mobile. Same site, same code, same deploy. That gap is the whole story, so let me start there.
+My portfolio scored 99 on desktop and 84 on mobile. Same site, same code, the same deploy. I sat with that for a bit, because it's a strange result, and strange results usually mean you're about to learn something.
 
-## The gap is the clue
+## The gap was the clue
 
-Lighthouse runs mobile under heavy throttling — roughly a 4× slower CPU and a simulated slow 4G connection. Desktop runs almost unthrottled. So a great desktop score next to a mediocre mobile one rarely means two different problems. It usually means *one* problem that only surfaces when the machine is slow. The desktop 99 was telling me the site was fundamentally sound; the mobile 84 was telling me something on the critical path got expensive under load.
+Lighthouse doesn't grade desktop and mobile the same way. Mobile runs with the brakes on: roughly a 4× slower CPU and a throttled, slow-4G connection. Desktop runs almost free. Once that landed, the gap stopped looking like two problems and started looking like one. If desktop is happy, the site itself is fine. The mobile score was just surfacing something that gets expensive when the device is slow, the kind of cost a fast laptop quietly hides from you.
 
-The metrics narrowed it down fast. Total Blocking Time was 0 ms and Cumulative Layout Shift was 0.003 — both effectively perfect. That rules out JavaScript jank and layout instability. The damage was entirely in First Contentful Paint and Largest Contentful Paint, both sitting at 3.2 seconds.
+The metrics agreed. Total Blocking Time was 0 ms and layout shift was basically nothing, so it wasn't janky scripts or things jumping around the page. All the damage lived in First Contentful Paint and Largest Contentful Paint, both stuck at 3.2 seconds. That last detail is the giveaway. When those two numbers are identical, it usually means the page sits blank and then everything pops in at once.
 
-And when FCP and LCP land on the exact same number, it usually means one thing: the page is blank, and then everything appears at once.
+## My hero was hiding from the browser
 
-## The hero was hiding itself
+The report told me the Largest Contentful Paint element was the little two-letter logo in my navbar. Which is silly on its face, the logo is tiny. So I went digging, and the answer was right there in the hero. Every part of it, headline included, started fully transparent and faded in.
 
-The LCP element — the single largest thing painted — was reported as the two-letter monogram in my navbar. That made no sense until I looked at the hero. Every element in it, including the main headline, started at `opacity: 0` and faded in with a CSS animation.
+That's the trap. As far as paint timing goes, something at zero opacity hasn't been painted yet. So my big headline, the obvious candidate for the largest paint, didn't count until its fade finished. With nothing else on screen, Lighthouse picked the only text it could actually see, the logo. On my laptop the fade was done before I noticed, so it never mattered. On a throttled phone it dragged the first real paint out to those 3.2 seconds.
 
-Here's the part that bites you: content at zero opacity hasn't been painted yet, as far as the browser's paint metrics are concerned. So my big headline didn't count as a paint until the fade finished. With nothing else visible, Lighthouse fell back to the only painted text it could find — the logo. On desktop the fade completed almost instantly, so it never mattered. On a throttled phone, the same fade pushed the first real paint out to 3.2 seconds.
-
-The fix was to keep the entrance but stop hiding content — swap the opacity fade for a transform-only rise:
+The fix was almost embarrassingly small. Keep the animation, just stop hiding things. I swapped the opacity fade for a plain transform:
 
 ```css
 /* Before: invisible until the animation runs */
@@ -31,22 +29,20 @@ The fix was to keep the entrance but stop hiding content — swap the opacity fa
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* After: painted immediately, it just settles into place */
+/* After: painted right away, it just settles into place */
 @keyframes riseUp {
   from { transform: translateY(18px); }
   to   { transform: translateY(0); }
 }
 ```
 
-Same feel, but the headline is on screen from the first frame. That single change is the difference between "blank for three seconds" and "readable immediately."
+Same little entrance, except the headline is on screen from the first frame instead of three seconds in. If there's one thing to take from all this, it's that fading in your most important above-the-fold content works against you. Paint it first. Animate the rest if you like.
 
-The takeaway: entrance animations that fade in above-the-fold content are quietly hostile to LCP. If it's the first thing a visitor should see, paint it first and animate the rest.
+## Fonts were holding the door
 
-## Fonts don't get to block the page
+Fonts were next. I pull a few families from Google Fonts, and that request was blocking the render. The browser was politely waiting on a third party before it would draw a single pixel.
 
-The next offender was fonts. I load a few families from Google Fonts, and the stylesheet was a render-blocking request — the browser waited on a third-party round trip before painting anything.
-
-Two changes. First, load the font CSS without blocking render, falling back to system fonts until it arrives:
+Two changes. First, let the fonts load without blocking anything, and fall back to system fonts until they arrive:
 
 ```html
 <link rel="preload" as="style" href="…fonts…" />
@@ -54,30 +50,30 @@ Two changes. First, load the font CSS without blocking render, falling back to s
 <noscript><link rel="stylesheet" href="…fonts…" /></noscript>
 ```
 
-The `media="print"` trick lets the browser fetch the stylesheet at a low priority and flip it to `all` once it loads. Text renders in a fallback font immediately and swaps when the real one is ready.
+The `media="print"` bit is a small hack. The browser grabs the stylesheet at low priority, then the onload flips it to `all`. Text shows up immediately in a fallback font and quietly swaps once the real one lands.
 
-Second, my site has two visual modes — an engineer side and a poet side — and each uses different typefaces. There was no reason to ship the poet serifs to everyone on first load when most visitors never switch. So I load only the default mode's fonts up front and fetch the others on demand the first time someone flips the toggle. Three families on first paint instead of five.
+Second, my site has two modes, an engineer side and a poet side, and they use different typefaces. I was shipping both sets to everyone on first load, which is wasteful when most people never flip the switch. Now the default mode's fonts load up front and the rest only arrive if someone actually toggles. Three families on first paint instead of five.
 
-## Trimming the critical path
+## Clearing the rest of the path
 
-With the big rocks gone, two smaller requests were still sitting on the critical path.
+The big rocks were gone. Two smaller things were still loitering on the critical path.
 
-The command palette — a search-and-ask overlay behind a keyboard shortcut — was being downloaded during page load even though it's closed by default. I changed it to mount only after it's first opened, so its code loads on demand instead of competing with the initial render.
+The command palette, that search-and-ask box behind a keyboard shortcut, was downloading on every page load even though it starts closed. So now it loads the first time someone opens it, and not a moment sooner.
 
-The last render-blocking request was my own CSS. The file is tiny — under 9 KB — so rather than fetch it separately, I inline the whole thing into the prerendered HTML at build time and drop the `<link>` entirely. No extra round trip; the page arrives already styled.
+The last blocker was my own CSS. It's small, under 9 KB, so instead of making the browser fetch it as a separate file, I paste the whole thing into the prerendered HTML at build time and drop the link. The page arrives already dressed, no extra trip.
 
-One caveat worth saying out loud: you can't defer your own CSS the way you defer fonts. Fonts have a fallback, so loading them late is graceful. Your app's stylesheet has no fallback — defer it and you get a flash of unstyled content. Inlining is the safe version of the same idea.
+One warning if you copy this. You cannot defer your own CSS the way you defer fonts. Fonts degrade gracefully because there's a fallback. Your stylesheet has none, so loading it late gives you a flash of unstyled, naked HTML. Inlining is the safe way to get the same speed.
 
-## What I chose not to do
+## The things I left alone
 
-Performance work has a long tail, and not every "opportunity" is worth taking.
+Not every suggestion is worth taking, and knowing what to ignore is half the job.
 
-Lighthouse flagged unused JavaScript and suggested code-splitting. The honest fix would be to lazy-load my writing pages so the home bundle doesn't carry them. But the site is statically prerendered for SEO, and my current tooling doesn't cleanly support lazy routes during prerender — get it wrong and you ship blank pages to crawlers. Trading real SEO for a few kilobytes is a bad deal, so I left it.
+Lighthouse wanted me to cut unused JavaScript by splitting my writing pages out of the main bundle. Reasonable on paper. But the site is prerendered to static HTML for SEO, and my current setup doesn't split lazy routes cleanly during that prerender step. Get it wrong and crawlers start receiving blank pages. I'm not trading real SEO for a few kilobytes, so it stays put for now.
 
-I also skipped a critical-CSS tool that surgically inlines only above-the-fold styles. With a sub-9 KB stylesheet, inlining all of it is simpler and just as fast. Match the solution to the size of the problem.
+I also passed on a tool that surgically inlines only the above-the-fold CSS. When your whole stylesheet is under 9 KB, inlining all of it is simpler and just as fast. Fit the fix to the size of the problem.
 
-## What it comes down to
+## What it came down to
 
-Most of this wasn't clever. It was removing things from the path between "request" and "first pixel": don't hide content you want painted, don't let fonts or stylesheets block the render, and don't ship code nobody asked for yet. Desktop hardware hides these costs. A throttled phone doesn't — which is exactly why the mobile score is the one worth chasing.
+None of this was clever, and I mean that kindly. It was mostly clearing junk out of the gap between asking for the page and seeing the first pixel. Don't hide what you want shown. Don't let fonts or CSS stand in the doorway. Don't ship code nobody asked for yet. A good laptop papers over all of it. A cheap phone on patchy wifi does not, and that phone is what a lot of people are actually holding.
 
-So if your desktop score is high and your mobile score isn't, resist the urge to hunt for two bugs. Look for the one thing on the critical path that gets expensive when the machine is slow. It's usually hiding in plain sight — sometimes literally, at `opacity: 0`.
+So if your desktop number is great and your mobile number isn't, don't go hunting for two separate bugs. Find the one thing on the critical path that gets slow when the hardware does. More often than not it's hiding in plain sight. In my case, literally, at zero opacity.
