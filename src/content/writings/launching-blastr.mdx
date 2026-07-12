@@ -1,0 +1,90 @@
+---
+title: "Launching Blastr: know the blast radius before you merge"
+date: "2026-07-12"
+kind: "code"
+summary: "A free GitHub Action that finds the risk hiding around your diff, not just inside it. Why I built it, how it works, and where it came from."
+tags: ["Launch", "GitHub Actions", "Developer Tools"]
+---
+
+Have you ever approved a twelve-line diff that then took down half the codebase? I have. The diff looked harmless, because the danger was never in the diff. It was in the fifty-four files downstream that nobody opened.
+
+That gap is the entire reason Blastr exists, and today it's live.
+
+## What it is
+
+Blastr is a free GitHub Action that tells you the blast radius of a pull request before you merge it. On every PR it reads your repo as a dependency graph, lines that graph up against the diff, and posts a short, deterministic risk report: which files can break the most if this change is wrong, which public APIs just moved, which "unrelated" files quietly change together, and which risky spots have no tests watching them. No LLM. No API key. No config. Nothing leaves your runner.
+
+You add it in about thirty seconds:
+
+```yaml
+# .github/workflows/blastr.yml
+name: Blastr
+on:
+  pull_request:
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  risk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history unlocks the co-change signal
+      - uses: Bidbogs-prog/blastr@v1
+```
+
+That's the whole setup. From then on every PR gets one comment, updated in place on each push, never a stack of bot noise. When a change is safe, it says so in a single green line. It's loud exactly as often as your repo is actually dangerous, which is the only way a red flag keeps meaning anything on pull request number four hundred.
+
+## Where it came from
+
+Blastr didn't start life as Blastr. It started with SoulForge.
+
+SoulForge is a code-intelligence engine that treats a codebase the way a good senior engineer does. Not as a pile of text files, but as a graph of symbols, imports, and call paths. I'd been building on top of it, and the thing that stuck with me was how much of real code review lives in that graph and nowhere else. A reviewer reads the diff. So does every LLM review bot. But the diff is the one place the actual risk usually isn't.
+
+The insight was almost embarrassingly simple once I saw it. If you already have the graph, you can answer a question no diff-reader can: if this file is wrong, what else breaks? That question doesn't need a language model. It needs structure, and structure is deterministic. So I took a focused slice of SoulForge's engine, wrapped it in a scorer, and shipped the cheapest, most honest version of the idea I could build: a free Action that runs the math on every PR and shows its work.
+
+## What it actually measures
+
+Every Blastr score is built from structural signals, and every one of them is traceable back to something real. Nothing is a vibe from a model. The main ones:
+
+- **Blast radius.** If this file breaks, how many files break with it? This is the heaviest signal, because it's the one your reviewer can't see by reading the change.
+- **Public API churn.** Did the diff touch exported symbols that other code depends on?
+- **Surprising coupling.** Which files historically change alongside this one but aren't actually imports? Blastr learns that from your git history, so it catches the landmines that live in the gaps between files.
+- **Centrality.** Is this a hub that everything routes through? It runs PageRank over the import graph, the same trick Google used on web pages, applied to your code.
+- **Untested hubs.** Is anything watching this file? The flag amplifies on hubs and goes quiet on leaves, so it never nags you about an untested config file.
+- **Churn.** The raw size of the change, as a small tiebreaker.
+
+Each file gets a score from zero to one hundred, and the PR takes the tier of its riskiest file. The model is versioned and deterministic. Same diff, same score, every time. Re-run it and it won't change its mind.
+
+## Why not just point an LLM at the diff
+
+Because an LLM reading your diff sees exactly what your human reviewer sees, and misses exactly what your human reviewer misses: everything around the change. It can write a convincing paragraph about the twelve lines in front of it. It cannot know those twelve lines are imported by fifty-four other files, because that fact simply isn't in the diff.
+
+Blastr and a review agent aren't rivals, though. Blastr tells you where the risk is. A person, or an agent, tells you whether it's real. Blastr is the cheap, always-on floor under that work. It runs on every PR, for free, and it never sends your code anywhere. The only network call it makes is the one that posts the comment.
+
+## How it works, briefly
+
+Three steps.
+
+1. **Index.** A tree-sitter pass builds a symbol and import graph across more than 25 languages, plus a co-change matrix from your git history.
+2. **Intersect.** The diff gets mapped onto that graph: changed lines against exported symbols, changed files against their dependents, the change against its historical co-change partners.
+3. **Score.** The weighted model runs and renders one comment and a job summary, with a per-file breakdown of exactly what drove each number.
+
+The first run on a big repo pays a one-time indexing cost. After that, most repos come back in well under a minute.
+
+## What's next
+
+The free Action tells you where the blast radius is. The next tier goes in after it and tells you whether it's realized.
+
+It's a graph-aware review agent, SoulForge working with the full map in hand, grounded by the same signals you see in the free report. It walks the real dependents, reads the callers, and reviews the PR sparingly and with justification instead of dumping a wall of comments. It runs as a hosted GitHub App with zero CI config, bring your own model. Early installs get it free during the beta, and the free Action you can install today stays free, for good.
+
+If that sounds useful, you can [grab early access here](https://github.com/Bidbogs-prog/blastr/issues/new?template=early-access.yml). Two clicks, two optional questions.
+
+## Try it
+
+Blastr is on the GitHub Marketplace today. It's free, and it's licensed BUSL-1.1, which converts to Apache 2.0 in 2030. Drop those few lines into a workflow and your next PR will tell you what it's about to touch, before you find out the hard way.
+
+If it catches even one merge that would have wrecked your afternoon, it paid for itself. Which is a low bar, because it's free.
+
+[Install Blastr](https://github.com/marketplace/actions/blastr-pr-risk-radar) · [Star it on GitHub](https://github.com/Bidbogs-prog/blastr) · [Get early access to the agent tier](https://github.com/Bidbogs-prog/blastr/issues/new?template=early-access.yml)
