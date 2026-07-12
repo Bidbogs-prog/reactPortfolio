@@ -38,9 +38,9 @@ That's the whole setup. From then on every PR gets one comment, updated in place
 
 ## Where it came from
 
-Blastr didn't start life as Blastr. It started with SoulForge.
+Blastr didn't start life as Blastr. It started with [SoulForge](https://soulforge.proxysoul.com/introduction), a code-intelligence engine built by proxysoul.
 
-SoulForge is a code-intelligence engine that treats a codebase the way a good senior engineer does. Not as a pile of text files, but as a graph of symbols, imports, and call paths. I'd been building on top of it, and the thing that stuck with me was how much of real code review lives in that graph and nowhere else. A reviewer reads the diff. So does every LLM review bot. But the diff is the one place the actual risk usually isn't.
+SoulForge treats a codebase the way a good senior engineer does. Not as a pile of text files, but as a graph of symbols, imports, and call paths. I'd been building on top of it, and the thing that stuck with me was how much of real code review lives in that graph and nowhere else. A reviewer reads the diff. So does every LLM review bot. But the diff is the one place the actual risk usually isn't.
 
 The insight was almost embarrassingly simple once I saw it. If you already have the graph, you can answer a question no diff-reader can: if this file is wrong, what else breaks? That question doesn't need a language model. It needs structure, and structure is deterministic. So I took a focused slice of SoulForge's engine, wrapped it in a scorer, and shipped the cheapest, most honest version of the idea I could build: a free Action that runs the math on every PR and shows its work.
 
@@ -86,5 +86,7 @@ If that sounds useful, you can [grab early access here](https://github.com/Bidbo
 Blastr is on the GitHub Marketplace today. It's free, and it's licensed BUSL-1.1, which converts to Apache 2.0 in 2030. Drop those few lines into a workflow and your next PR will tell you what it's about to touch, before you find out the hard way.
 
 If it catches even one merge that would have wrecked your afternoon, it paid for itself. Which is a low bar, because it's free.
+
+And credit where it belongs: the graph intelligence underneath Blastr is [SoulForge](https://soulforge.proxysoul.com/introduction), by proxysoul. Blastr stands on that work.
 
 [Install Blastr](https://github.com/marketplace/actions/blastr-pr-risk-radar) · [Star it on GitHub](https://github.com/Bidbogs-prog/blastr) · [Get early access to the agent tier](https://github.com/Bidbogs-prog/blastr/issues/new?template=early-access.yml)
