@@ -1,0 +1,83 @@
+---
+title: "I tested whether Blastr's risk scores actually predict reverts"
+date: "2026-08-02"
+kind: "code"
+summary: "235 PRs across four open source repos, scored at merge time with no future information. Reverted PRs scored higher. Here's the study, the numbers, and the parts that didn't work."
+tags: ["Blastr", "Study", "Developer Tools", "Code Review"]
+---
+
+A few weeks ago I launched [Blastr](https://github.com/Bidbogs-prog/blastr), a free GitHub Action that scores the structural risk of a pull request. Blast radius over the import graph, public API churn, co-change coupling, that family of signals. The pitch is that the danger of a PR usually lives outside the diff, in the files nobody opened.
+
+It's a nice pitch. It's also exactly the kind of claim that deserves a harder question: do these scores actually mean anything?
+
+So I ran a study. I took four open source repos, found the PRs that later got reverted, scored them with Blastr exactly as they looked at merge time, and compared them against a random sample of merged PRs that were never reverted. If the scores are real, reverted PRs should have scored higher on the day they merged, before anyone knew they'd be reverted.
+
+They did. Not overwhelmingly, and not in every repo, and I'll show you the repo where it flat out didn't work. But the effect is there, it survives the obvious confound, and everything is public and reproducible down to the RNG seed.
+
+## The setup, honestly
+
+The full methodology is [in the repo](https://github.com/Bidbogs-prog/blastr-revert-study), but here's the shape of it.
+
+**Four repos:** `vitejs/vite`, `microsoft/playwright`, `angular/angular`, and `vuejs/core`, over an 18 month window. I surveyed 14 candidate repos and ranked them by revert activity, but Blastr's engine caps its index at 10,000 files, so revert-rich giants like vscode and next.js were out. That's a selection bias and I'm naming it up front: these are mid-sized, mostly TypeScript, squash-merge repos, and the results generalize to that population, not to "PRs in general."
+
+**Finding reverts:** two sources, unioned. GitHub title search for merged PRs with "revert" in the title, plus `git log --grep` on a full clone to catch reverts whose PR title doesn't say so. Each revert gets mapped back to its original PR, with the mapping confidence recorded on the row: an explicit "Reverts #N" reference, a "This reverts commit sha" resolution, or a title match as the last resort.
+
+**Exclusions, applied to both groups:** reverts of reverts (that's re-landing churn, not a review signal), docs and lockfile-only PRs (no structural surface by construction), and, importantly, anything reverted within 24 hours. Sub-day reverts are overwhelmingly "broke the build, back it out" CI churn. Blastr's claim is about review-time risk, so keeping those in would have juiced the numbers with easy wins.
+
+**The control group** is a seeded random sample of merged PRs from the same window, with the same exclusions, drawn with a fixed shuffle so the sample is a deterministic prefix. Same seed, same sample, every run.
+
+**Scoring:** each PR, in both groups, gets checked out at its exact head sha as it existed at merge time, and Blastr scores it against the recorded merge-time base. The part I care most about: no future information can leak into a score. Blastr reads git history by walking ancestors of the checkout, and commits that landed after the PR are simply unreachable from there. The checkout is the time bound. No LLM anywhere in the pipeline either, Blastr is a deterministic static analyzer, so every number below can be recomputed exactly.
+
+That gave me 75 reverted PRs and 160 controls, 235 scored PRs total, zero scoring failures.
+
+## The results
+
+Headline numbers first, pooled across all four repos:
+
+| | reverted | control |
+|---|---|---|
+| median score | **29** | **20.5** |
+| % scoring elevated or high | **49%** | **26%** |
+
+Reverted PRs scored higher at merge time, and nearly twice as many of them landed in the tiers where Blastr would have raised a flag.
+
+Group sizes differ per repo, and a naive pool would confound "reverted vs control" with "which repo," so the headline statistic is stratified: per-repo Mann-Whitney and Cliff's delta, combined across repos. That gives **Cliff's delta of 0.27, p = 0.005**. In plain terms: pick a random reverted PR and a random control from the same repo, and the reverted one scores higher noticeably more often than chance. The conventional label for that effect size is "small," and I'm going to keep calling it that, because it is.
+
+Per repo:
+
+| repo | reverted n | Cliff's δ | p |
+|---|---|---|---|
+| microsoft/playwright | 59 | 0.27 | 0.023 |
+| angular/angular | 4 | 0.69 | 0.026 |
+| vitejs/vite | 4 | 0.46 | 0.140 |
+| vuejs/core | 8 | -0.05 | 0.825 |
+
+Playwright is the repo that matters most here, since it carries most of the reverted sample, and the effect holds there on its own. Angular and vite point the same way on tiny samples.
+
+And then there's vuejs/core, where the effect is a flat zero. Eight reverted PRs, medians basically identical. Maybe it's the small n, maybe vue's reverts skew toward product decisions rather than structural breakage, maybe the repo is small enough (around 500 code files) that structural signals compress. I don't know, and I'd rather show you the null result than quietly drop the repo. Three of four repos going the same direction, with the biggest sample among them significant on its own, is what an honest small effect looks like.
+
+## The objection you're already typing
+
+"Big PRs get reverted more. Your score includes churn. You've built a very elaborate line counter."
+
+That was my first worry too, so the study re-reports everything within diff-size buckets. Churn is only 5 of 100 points in the model, but size correlates with other signals, more files touched means more chances to hit a hub, so the confound is real and worth checking.
+
+Within small PRs, 50 changed lines or fewer, 27% of reverted PRs scored elevated or high versus 16% of controls. In the 51 to 300 line bucket it's 55% versus 33%. The gap shrinks in the larger buckets, but the n up there is tiny, single digits per group. The effect is not just size. If it had vanished inside the buckets, the honest headline would have been "Blastr mostly measures size," and I'd have written that article instead.
+
+## What this buys you in practice
+
+Statistics are one framing. Here's the operational one. Suppose you'd used "elevated or above" as a gate for extra review attention across these repos. Recall is 49%: half of the PRs that were later reverted would have been flagged for a closer look on the day they were opened, by a deterministic score that runs free in CI, sees nothing but your repo, and finishes in about a minute.
+
+Half is not magic. Half is also not nothing, considering the reviewer got that signal at review time, when it was still cheap to act on, instead of from the revert commit two weeks later.
+
+Reverts are an imperfect proxy for review failure and I want to be plain about that. Some bad merges get fixed forward and never show up as reverts. Some reverts are product decisions no reviewer could have caught. The 24 hour rule strips out the most mechanical churn, but "reverted" and "should have been caught in review" are overlapping sets, not the same set. This study measures the overlap it can measure.
+
+## Check my work
+
+Everything is in the [study repo](https://github.com/Bidbogs-prog/blastr-revert-study): methodology, every exclusion rule with per-rule counts, the collected data snapshot, per-PR score breakdowns, and the stats code. The whole thing is pinned and seeded, so `./run.sh` reproduces the published numbers exactly from the committed snapshot, no API token needed. If you think the method is flawed somewhere, the repo is the place to prove it, and I genuinely want the issue.
+
+And if you want the thing being tested: [Blastr](https://github.com/marketplace/actions/blastr-pr-risk-radar) is a free GitHub Action, about six lines of YAML, no config, no API key, nothing leaves your runner. Your next PR gets a risk report built from the same signals this study just put under the microscope.
+
+I built Blastr on the belief that a PR's risk lives in the structure around the diff. Now there's at least one careful, reproducible data point saying that belief holds up. Small effect, honestly measured, free to verify.
+
+[Install Blastr](https://github.com/marketplace/actions/blastr-pr-risk-radar) · [Read the full study](https://github.com/Bidbogs-prog/blastr-revert-study) · [Star it on GitHub](https://github.com/Bidbogs-prog/blastr)
