@@ -4,6 +4,7 @@ import mdx from "@mdx-js/rollup";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 import remarkBreaks from "remark-breaks";
+import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import fs from "fs";
 import path from "path";
@@ -175,7 +176,12 @@ export default defineConfig({
     {
       enforce: "pre",
       ...mdx({
-        remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter, remarkBreaks],
+        remarkPlugins: [
+          remarkFrontmatter,
+          remarkMdxFrontmatter,
+          remarkGfm,
+          remarkBreaks,
+        ],
         rehypePlugins: [rehypeHighlight],
       }),
     },

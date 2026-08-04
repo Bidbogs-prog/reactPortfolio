@@ -24,6 +24,7 @@
     "rehype-highlight": "^7.0.2",
     "remark-breaks": "^4.0.0",
     "remark-frontmatter": "^5.0.0",
+    "remark-gfm": "^4.0.1",
     "remark-mdx-frontmatter": "^5.2.0",
     "resend": "^6.14.0",
     "tailwind-merge": "^2.6.0",
