@@ -34,9 +34,10 @@ function Mark() {
         d="M20.5 2.5c6-.6 11.5 2.4 14.6 7.4 2.6 4.3 3.5 9.9 1.2 14.6-2.3 4.8-7.1 8.2-12.2 9.6-5 1.3-10.9.9-14.9-2.5C5.3 28.4 3.2 22.6 4 17.3 5 11.1 9.6 5.6 15.4 3.5c1.7-.6 3.4-.9 5.1-1Z"
         style={{ filter: "url(#ink-seal)" }}
       />
+      {/* Baseline placed so the caps sit on the blob's centre (20.7, 18.6). */}
       <text
-        x="20"
-        y="25"
+        x="20.7"
+        y="23.1"
         textAnchor="middle"
         className="fill-background font-display text-[13px] font-bold"
         style={{ letterSpacing: "-0.04em" }}
