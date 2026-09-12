@@ -708,3 +708,50 @@ html.ink-cursor-on select {
 .ink-splat.is-live {
   animation: ink-splat-fly 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* --- Reading progress (writing posts) --- */
+.ink-progress {
+  --p: 0;
+  background: hsl(var(--foreground) / 0.12);
+}
+.ink-progress::before {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: 0;
+  width: 3px;
+  height: calc(var(--p) * 100%);
+  background: hsl(var(--primary));
+}
+.ink-progress::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: calc(var(--p) * 100%);
+  transform: translate(-50%, -30%);
+  width: 7px;
+  height: 7px;
+  background: hsl(var(--primary));
+}
+.ink-progress[data-end="drop"]::after {
+  width: 9px;
+  height: 12px;
+  border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+}
+
+/* --- Kind strokes (writing kinds), drawn on hover --- */
+.kind-stroke path {
+  stroke-dasharray: 60;
+  stroke-dashoffset: 0;
+}
+.group:hover .kind-stroke path {
+  animation: kind-draw 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes kind-draw {
+  from {
+    stroke-dashoffset: 60;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}

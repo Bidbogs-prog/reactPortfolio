@@ -1,9 +1,9 @@
-import { useEffect, useRef, type ElementType, type HTMLAttributes, type ReactNode } from "react";
+import { useEffect, useRef, type ElementType, type AllHTMLAttributes, type ReactNode } from "react";
 import { useRegister } from "@/lib/register";
 import { useMotionTier } from "@/lib/motion/tier";
 import { cn } from "@/lib/utils";
 
-interface InkStampProps extends Omit<HTMLAttributes<HTMLElement>, "children"> {
+interface InkStampProps extends Omit<AllHTMLAttributes<HTMLElement>, "children" | "as"> {
   children: ReactNode;
   className?: string;
   as?: ElementType;

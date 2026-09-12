@@ -1,14 +1,25 @@
-import { Link, useParams } from "react-router-dom";
+import { useRef } from "react";
+import { useParams } from "react-router-dom";
 import { getWriting, formatDate } from "@/lib/writings";
 import { cn } from "@/lib/utils";
 import { ArrowLeft } from "lucide-react";
 import { VerseReader } from "@/components/verse-reader";
+import { InkLink } from "@/components/ink/ink-link";
+import { InkHeadline } from "@/components/ink/ink-headline";
+import { InkStamp, InkStampGroup } from "@/components/ink/ink-stamp";
+import { InkProgress } from "@/components/ink/ink-progress";
+import { InkBlots } from "@/components/ink/ink-blots";
+import { InkRule } from "@/components/ink/ink-rule";
+import { KindIcon } from "@/components/kind-icon";
+import { useRegister } from "@/lib/register";
 import NotFoundPage from "@/pages/not-found";
 import { Seo, SITE_URL, SITE_NAME } from "@/components/seo";
 
 export default function WritingPostPage() {
   const { slug } = useParams();
   const writing = slug ? getWriting(slug) : undefined;
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const { register } = useRegister();
 
   if (!writing) return <NotFoundPage />;
 
@@ -49,7 +60,7 @@ export default function WritingPostPage() {
   };
 
   return (
-    <article className="relative min-h-screen pt-32 pb-28">
+    <article className="relative min-h-screen overflow-hidden pt-32 pb-28">
       <Seo
         title={`${title} — ${SITE_NAME}`}
         description={summary}
@@ -59,68 +70,82 @@ export default function WritingPostPage() {
         tags={tags}
         jsonLd={[articleLd, breadcrumbLd]}
       />
+      {/* Poet register: a faint ink field behind the column */}
+      {(isVerse || register === "poet") && (
+        <InkBlots
+          className="absolute inset-x-0 top-0 h-[70vh] opacity-[0.12]"
+          intensity={0.6}
+          interactive={false}
+          every={6}
+        />
+      )}
+
+      <InkProgress target={bodyRef} />
+
       <div className="container relative max-w-3xl">
-        <Link
+        <InkLink
           to="/writings"
-          className="group inline-flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:text-primary"
+          className="group inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground transition-colors hover:text-primary"
         >
           <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
           All writings
-        </Link>
+        </InkLink>
 
-        <header className={cn("mt-8", isVerse && "text-center")}>
+        <header className={cn("mt-10", isVerse && "text-center")}>
           <div
             className={cn(
-              "flex items-center gap-3 font-mono text-xs uppercase tracking-wider text-muted-foreground",
+              "group flex items-center gap-3 font-mono text-[0.68rem] uppercase tracking-[0.2em] text-muted-foreground",
               isVerse && "justify-center"
             )}
           >
+            <KindIcon kind={kind} className="h-3.5 w-3.5 text-primary" />
             <span className="text-primary">{kind}</span>
-            <span className="h-px w-6 bg-border" />
+            <span className="h-px w-6 bg-foreground/25" />
             <time dateTime={date}>{formatDate(date)}</time>
           </div>
 
-          <h1
+          <InkHeadline
+            text={title}
+            trigger="mount"
+            delay={0.1}
+            stagger={0.018}
             className={cn(
-              "mt-5 text-balance text-4xl text-foreground md:text-5xl",
-              isVerse && "font-serif italic",
-              isProse && "font-serif",
-              !isVerse && !isProse && "display"
+              "mt-6 text-balance text-[clamp(2.4rem,6vw,4.4rem)] leading-[1.02] text-foreground",
+              isVerse && "font-serif font-medium italic",
+              isProse && "font-serif font-medium",
+              !isVerse && !isProse && "display ink-text tracking-[-0.03em]"
             )}
-          >
-            {title}
-          </h1>
+          />
 
           {tags && tags.length > 0 && (
-            <ul
-              className={cn(
-                "mt-5 flex flex-wrap gap-2",
-                isVerse && "justify-center"
-              )}
+            <InkStampGroup
+              className={cn("mt-7 flex flex-wrap gap-2", isVerse && "justify-center")}
+              stagger={0.05}
             >
-              {tags.map((tag) => (
-                <li
-                  key={tag}
-                  className="rounded-md border border-border bg-card px-2.5 py-1 font-mono text-xs text-muted-foreground"
-                >
+              {tags.map((tag, i) => (
+                <InkStamp key={tag} as="li" index={i} className="list-none">
                   {tag}
-                </li>
+                </InkStamp>
               ))}
-            </ul>
+            </InkStampGroup>
           )}
+
+          <InkRule seed={7} className="mt-10" />
         </header>
 
-        {isVerse ? (
-          <VerseReader
-            key={slug}
-            Component={Component}
-            className="mx-auto mt-12 max-w-xl"
-          />
-        ) : (
-          <div className={cn("mt-12", isProse ? "prose-story" : "prose-hc")}>
-            <Component />
-          </div>
-        )}
+        <div ref={bodyRef}>
+          {isVerse ? (
+            <VerseReader
+              key={slug}
+              Component={Component}
+              className="mx-auto mt-12 max-w-xl"
+            />
+          ) : (
+            <div className={cn("mt-12", isProse ? "prose-story" : "prose-hc")}>
+              <Component />
+            </div>
+          )}
+        </div>
       </div>
     </article>
   );
