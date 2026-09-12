@@ -187,22 +187,26 @@ export const displayFrag = /* glsl */ `
     vec2 uv = vUv;
     // Plotter register: sample partly from the grid cell centre so ink
     // reads as blocks that sit on the 56px grid.
+    // A light pull toward the grid cell centre keeps a hint of the
+    // plotter without turning the ink into blocks.
     vec2 cellUv = (floor(uv * gridCells) + 0.5) / gridCells;
-    uv = mix(uv, cellUv, gridSnap * 0.22);
+    uv = mix(uv, cellUv, gridSnap * 0.06);
 
     float d = texture2D(uDye, uv).r * intensity;
     float density = clamp(d, 0.0, 1.5);
 
-    float alpha = smoothstep(0.02, 0.55, density);
+    float alpha = smoothstep(0.02, 0.6, density);
     // Poet register: a darker rim where the ink thins (ink in water).
     float rim = smoothstep(0.02, 0.10, density) * (1.0 - smoothstep(0.10, 0.34, density));
     vec3 col = accent * (0.55 + 0.45 * smoothstep(0.25, 1.1, density));
     col = mix(col, col * 0.45, rim * (1.0 - gridSnap) * 0.8);
 
-    // Engineer register: threshold through an ordered dither = halftone ink.
+    // Engineer register: halftone only where the ink thins out, so the
+    // body stays smooth and the edges read as plotter dots.
     float t = bayer(gl_FragCoord.xy / 2.0);
     float dithered = step(t, alpha);
-    alpha = mix(alpha, dithered * max(alpha, 0.6), dither);
+    float edgeBand = 1.0 - smoothstep(0.12, 0.5, density);
+    alpha = mix(alpha, max(dithered * alpha, alpha * 0.35), dither * edgeBand);
 
     gl_FragColor = vec4(col, alpha * 0.8);
   }
