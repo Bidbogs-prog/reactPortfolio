@@ -12,6 +12,17 @@ export interface Project {
 
 export const projects: Project[] = [
   {
+    id: "so3ra",
+    title: "So3ra",
+    year: "2026",
+    description:
+      "A mobile-first calorie and macro tracker for Morocco: onboarding computes BMR/TDEE and locks in daily targets, a per-100 g food library (seeded from Open Food Facts and USDA) makes portions exact, and a Gemini-backed coach answers nutrition questions in English, French, or Darija.",
+    highlight: "Gram-exact macros, AI coach, 3 languages",
+    tags: ["Next.js", "React", "TypeScript", "Supabase", "PostgreSQL", "Tailwind CSS", "Gemini"],
+    demoUrl: "https://so3ra.app",
+    githubUrl: "https://github.com/Bidbogs-prog/fittrack",
+  },
+  {
     id: "pieces-maroc",
     title: "PiecesMaroc",
     year: "2026",
