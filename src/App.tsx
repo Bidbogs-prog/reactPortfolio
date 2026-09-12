@@ -4,6 +4,10 @@ import { RegisterProvider } from "@/lib/register";
 import { AgentProvider, useAgent } from "@/lib/agent/agent-provider";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
+import { SmoothScrollProvider, useSmoothScroll } from "@/lib/motion/smooth-scroll";
+import { InkTransitionProvider } from "@/components/ink/ink-transition";
+import { InkDefs } from "@/components/ink/ink-defs";
+import { InkCursor } from "@/components/ink/ink-cursor";
 
 // Lazy — it's a closed overlay on load, so it shouldn't ship in the initial JS.
 const CommandPalette = lazy(() =>
@@ -33,17 +37,19 @@ function CommandPaletteHost() {
 /** Scroll to top on route change, or to a hash target if present. */
 function ScrollManager() {
   const { pathname, hash } = useLocation();
+  const { scrollTo } = useSmoothScroll();
 
   useEffect(() => {
     if (hash) {
-      const el = document.getElementById(hash.slice(1));
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth" });
-        return;
+      const id = hash.slice(1);
+      if (document.getElementById(id)) {
+        // Let the route's first paint (and any ink flood) land first.
+        const t = window.setTimeout(() => scrollTo(id), 60);
+        return () => window.clearTimeout(t);
       }
     }
-    window.scrollTo({ top: 0 });
-  }, [pathname, hash]);
+    scrollTo(0, { immediate: true });
+  }, [pathname, hash, scrollTo]);
 
   return null;
 }
@@ -53,24 +59,30 @@ export default function App() {
   return (
     <RegisterProvider>
       <AgentProvider>
-        <div className="grain relative min-h-screen">
-          <a
-            href="#main"
-            className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground"
-          >
-            Skip to content
-          </a>
+        <SmoothScrollProvider>
+          <InkTransitionProvider>
+            <InkDefs />
+            <div className="grain relative min-h-screen">
+              <a
+                href="#main"
+                className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground"
+              >
+                Skip to content
+              </a>
 
-          <ScrollManager />
-          <Navbar />
+              <ScrollManager />
+              <Navbar />
 
-          <main id="main">
-            <Outlet />
-          </main>
+              <main id="main">
+                <Outlet />
+              </main>
 
-          <Footer />
-          <CommandPaletteHost />
-        </div>
+              <Footer />
+              <CommandPaletteHost />
+            </div>
+            <InkCursor />
+          </InkTransitionProvider>
+        </SmoothScrollProvider>
       </AgentProvider>
     </RegisterProvider>
   );

@@ -1,0 +1,423 @@
+/* ============================================================
+   INK SYSTEM
+   Loaded after index.css (see main.tsx). Everything the ink
+   primitives need: headline pours, stamps, cursor, section frame.
+   ============================================================ */
+
+/* Animatable fill amount for ink headlines (0 = outline, 1 = solid). */
+@property --fill {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+/* --- Smooth scroll (Lenis, full tier only) --- */
+html.lenis,
+html.lenis body,
+html.lenis-on,
+html.lenis-on body {
+  height: auto;
+}
+html.lenis-on,
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+/* --- Ink headline: outlined from frame one, then fills --- */
+.ink-headline {
+  display: block;
+}
+.ink-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+.ink-char {
+  --fill: 0;
+  display: inline-block;
+  color: transparent;
+  -webkit-text-stroke: 1px hsl(var(--foreground) / 0.5);
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+/* Engineer: a hard-edged pour, left to right. */
+.ink-headline[data-ink="pour"] .ink-char {
+  background-image: linear-gradient(
+    92deg,
+    hsl(var(--foreground)) 0%,
+    hsl(var(--foreground)) calc(var(--fill) * 118% - 18%),
+    transparent calc(var(--fill) * 118%)
+  );
+}
+/* Poet: ink blooms out from the middle of each glyph. */
+.ink-headline[data-ink="bloom"] .ink-char {
+  background-image: radial-gradient(
+    ellipse 70% 60% at 50% 55%,
+    hsl(var(--foreground)) calc(var(--fill) * 95%),
+    transparent calc(var(--fill) * 95% + 22%)
+  );
+}
+@keyframes ink-fill {
+  from {
+    --fill: 0;
+  }
+  to {
+    --fill: 1;
+  }
+}
+.ink-headline.is-inked .ink-char {
+  animation: ink-fill 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--i) * 28ms + var(--ink-delay, 0ms));
+}
+.ink-headline[data-ink="bloom"].is-inked .ink-char {
+  animation-duration: 1.4s;
+  animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+}
+.ink-headline.is-gsap .ink-char {
+  animation: none;
+}
+/* Accent-inked words */
+.ink-headline .ink-word.accent .ink-char {
+  -webkit-text-stroke-color: hsl(var(--primary) / 0.6);
+}
+.ink-headline[data-ink="pour"] .ink-word.accent .ink-char {
+  background-image: linear-gradient(
+    92deg,
+    hsl(var(--primary)) 0%,
+    hsl(var(--primary)) calc(var(--fill) * 118% - 18%),
+    transparent calc(var(--fill) * 118%)
+  );
+}
+.ink-headline[data-ink="bloom"] .ink-word.accent .ink-char {
+  background-image: radial-gradient(
+    ellipse 70% 60% at 50% 55%,
+    hsl(var(--primary)) calc(var(--fill) * 95%),
+    transparent calc(var(--fill) * 95% + 22%)
+  );
+}
+
+/* Hairline turbulence on display type: looks inked, not typeset. */
+.ink-text {
+  filter: url(#ink-text);
+}
+
+/* --- Section frame --- */
+.section-frame {
+  isolation: isolate;
+}
+.section-numeral {
+  position: absolute;
+  left: -0.05em;
+  top: 0.55em;
+  z-index: -1;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(8rem, 22vw, 18rem);
+  line-height: 1;
+  letter-spacing: -0.06em;
+  color: transparent;
+  -webkit-text-stroke: 1px hsl(var(--foreground) / 0.13);
+  pointer-events: none;
+  user-select: none;
+}
+[data-register="poet"] .section-numeral {
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  -webkit-text-stroke: 1px hsl(var(--primary) / 0.22);
+}
+.running-label {
+  position: absolute;
+  left: -3.25rem;
+  top: 8rem;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: hsl(var(--muted-foreground) / 0.55);
+  pointer-events: none;
+  user-select: none;
+}
+.marginalia {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  line-height: 1.7;
+  letter-spacing: 0.04em;
+  color: hsl(var(--muted-foreground));
+}
+.marginalia::before {
+  content: "// ";
+  color: hsl(var(--primary));
+}
+[data-register="poet"] .marginalia {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.9rem;
+  letter-spacing: 0;
+}
+[data-register="poet"] .marginalia::before {
+  content: "¶ ";
+}
+/* Plotter registration marks at the section's top corners */
+.reg-mark {
+  position: absolute;
+  top: 0.75rem;
+  width: 14px;
+  height: 14px;
+  opacity: 0.4;
+  pointer-events: none;
+}
+.reg-mark-tl {
+  left: 0.75rem;
+}
+.reg-mark-tr {
+  right: 0.75rem;
+}
+.reg-mark::before,
+.reg-mark::after {
+  content: "";
+  position: absolute;
+  background: hsl(var(--foreground));
+}
+.reg-mark::before {
+  left: 50%;
+  top: 0;
+  width: 1px;
+  height: 100%;
+}
+.reg-mark::after {
+  top: 50%;
+  left: 0;
+  height: 1px;
+  width: 100%;
+}
+
+/* --- Stamps --- */
+.stamp {
+  --tilt: 0deg;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  padding: 0.42em 0.8em;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: hsl(var(--foreground) / 0.85);
+  border: 1.5px solid hsl(var(--foreground) / 0.55);
+  transform: rotate(var(--tilt));
+  transform-origin: 50% 50%;
+  transition: color 0.25s, border-color 0.25s, background-color 0.25s;
+  filter: url(#ink-stamp);
+}
+.stamp-rubber {
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 2px hsl(var(--background)),
+    inset 0 0 0 3px hsl(var(--foreground) / 0.3);
+}
+.stamp-seal {
+  border-radius: 999px;
+  border: 3px double hsl(var(--foreground) / 0.55);
+  padding: 0.5em 0.95em;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.82rem;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  filter: url(#ink-seal);
+}
+.stamp-solid {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-color: hsl(var(--primary));
+}
+.stamp-solid.stamp-rubber {
+  box-shadow: inset 0 0 0 2px hsl(var(--primary)),
+    inset 0 0 0 3px hsl(var(--primary-foreground) / 0.5);
+}
+a.stamp:hover,
+button.stamp:hover,
+.stamp[data-hover]:hover {
+  color: hsl(var(--primary));
+  border-color: hsl(var(--primary));
+}
+.stamp-group .stamp:not(.is-gsap):not(.is-pressed) {
+  opacity: 0;
+  transform: rotate(calc(var(--tilt) + 6deg)) scale(1.6);
+}
+@keyframes stamp-in {
+  from {
+    opacity: 0;
+    transform: rotate(calc(var(--tilt) + 6deg)) scale(1.6);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(var(--tilt)) scale(1);
+  }
+}
+.stamp-group .stamp.is-pressed:not(.is-gsap) {
+  animation: stamp-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: var(--stamp-delay, 0ms);
+}
+
+/* --- Cursor --- */
+html.ink-cursor-on,
+html.ink-cursor-on a,
+html.ink-cursor-on button,
+html.ink-cursor-on [role="button"],
+html.ink-cursor-on label,
+html.ink-cursor-on summary {
+  cursor: none;
+}
+html.ink-cursor-on input,
+html.ink-cursor-on textarea,
+html.ink-cursor-on select {
+  cursor: auto;
+}
+.ink-cursor {
+  --size: 10px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 96;
+  width: var(--size);
+  height: var(--size);
+  pointer-events: none;
+  background: hsl(var(--primary));
+  transition: width 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.25s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s,
+    background-color 0.2s, box-shadow 0.25s;
+  will-change: transform;
+}
+.ink-cursor[data-shape="nib"] {
+  clip-path: polygon(50% 0, 100% 62%, 50% 100%, 0 62%);
+}
+.ink-cursor[data-shape="brush"] {
+  border-radius: 50%;
+  box-shadow: 0 0 8px hsl(var(--primary) / 0.7);
+}
+.ink-cursor.is-hover {
+  --size: 40px;
+  background: hsl(var(--primary) / 0.22);
+  clip-path: none;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px hsl(var(--primary));
+}
+.ink-cursor.is-down {
+  --size: 6px;
+}
+.ink-cursor.is-native {
+  opacity: 0 !important;
+}
+
+/* --- Ink well (command bar) --- */
+.inkwell {
+  position: relative;
+  background: radial-gradient(
+      120% 100% at 50% 0%,
+      hsl(var(--foreground) / 0.06),
+      transparent 60%
+    ),
+    hsl(var(--background) / 0.7);
+  box-shadow: inset 0 1px 0 hsl(var(--foreground) / 0.12),
+    inset 0 -1px 0 hsl(var(--background)),
+    0 20px 50px -30px hsl(var(--primary) / 0.5);
+  border: 1px solid hsl(var(--foreground) / 0.12);
+}
+.inkwell:hover {
+  border-color: hsl(var(--primary) / 0.5);
+}
+
+/* --- Ink fill hover for buttons (a drop of accent swells up from the corner) --- */
+.ink-fill-btn {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.ink-fill-btn::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  z-index: -1;
+  background: hsl(var(--primary));
+  clip-path: circle(0% at 30% 120%);
+  transition: clip-path 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.ink-fill-btn:hover::before,
+.ink-fill-btn:focus-visible::before {
+  clip-path: circle(140% at 30% 120%);
+}
+.ink-fill-btn:hover,
+.ink-fill-btn:focus-visible {
+  color: hsl(var(--primary-foreground));
+  border-color: hsl(var(--primary));
+}
+
+/* --- Reduced motion: everything finished, nothing moving --- */
+@media (prefers-reduced-motion: reduce) {
+  .ink-char {
+    --fill: 1;
+    animation: none !important;
+  }
+  .stamp-group .stamp {
+    opacity: 1;
+    transform: rotate(var(--tilt));
+    animation: none !important;
+  }
+}
+
+/* --- Navbar ink dot --- */
+.nav-dot {
+  position: absolute;
+  left: 0;
+  bottom: 2px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: hsl(var(--primary));
+  pointer-events: none;
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s;
+}
+@keyframes nav-smear {
+  0% {
+    scale: 1 1;
+  }
+  35% {
+    scale: 3.2 0.7;
+  }
+  100% {
+    scale: 1 1;
+  }
+}
+.nav-dot.is-smearing {
+  animation: nav-smear 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* --- Hero scroll drip --- */
+@keyframes ink-drip {
+  0% {
+    transform: translateY(-100%) scaleY(0.4);
+  }
+  60% {
+    transform: translateY(0) scaleY(1);
+  }
+  100% {
+    transform: translateY(100%) scaleY(0.6);
+  }
+}
+.ink-drip {
+  transform-origin: 50% 0%;
+  animation: ink-drip 2.2s cubic-bezier(0.6, 0, 0.4, 1) infinite;
+}
+
+/* --- Ink lines (SplitText masks) --- */
+.ink-lines .ink-line {
+  will-change: transform;
+}
