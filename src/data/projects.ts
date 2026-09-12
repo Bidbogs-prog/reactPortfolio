@@ -19,7 +19,7 @@ export const projects: Project[] = [
       "A mobile-first calorie and macro tracker for Morocco: onboarding computes BMR/TDEE and locks in daily targets, a per-100 g food library (seeded from Open Food Facts and USDA) makes portions exact, and a Gemini-backed coach answers nutrition questions in English, French, or Darija.",
     highlight: "Gram-exact macros, AI coach, 3 languages",
     tags: ["Next.js", "React", "TypeScript", "Supabase", "PostgreSQL", "Tailwind CSS", "Gemini"],
-    demoUrl: "https://so3ra.app",
+    demoUrl: "https://so3ra-zeta-two.vercel.app",
     githubUrl: "https://github.com/Bidbogs-prog/fittrack",
   },
   {
