@@ -45,7 +45,9 @@ export default function HeroSection() {
       className="relative flex min-h-[100svh] items-center overflow-hidden"
     >
       {/* Ink */}
-      <InkFluid className="absolute inset-0 h-full w-full" />
+      <InkFluid className="absolute inset-0 h-full w-full" intensity={0.85} />
+      {/* Keeps the copy legible when ink drifts under it */}
+      <div className="pointer-events-none absolute inset-0 [background:radial-gradient(55%_45%_at_28%_62%,hsl(var(--background)/0.82),transparent_100%)]" />
 
       {/* Plotter grid (engineer) / paper vignette (poet) */}
       {poet ? (

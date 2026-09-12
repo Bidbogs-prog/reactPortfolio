@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useRegister } from "@/lib/register";
-import { useMotionTier } from "@/lib/motion/tier";
+import { useMotionTier, whenIdle } from "@/lib/motion/tier";
 import { inkTheme } from "@/lib/motion/ink-theme";
 import { cn } from "@/lib/utils";
 
@@ -52,14 +52,16 @@ export function InkBlots({ className, intensity = 1, interactive = true, every =
     const blots: Blot[] = [];
     const grid = 56;
 
+    // Half-resolution backing store: blots are soft, and this keeps the
+    // per-frame clear + fill cheap on phones.
+    const RES = 0.5;
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
       w = Math.max(1, rect.width);
       h = Math.max(1, rect.height);
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      canvas.width = Math.max(1, Math.round(w * RES));
+      canvas.height = Math.max(1, Math.round(h * RES));
+      ctx.setTransform(RES, 0, 0, RES, 0, 0);
     };
 
     const add = (x: number, y: number, scale = 1) => {
@@ -67,7 +69,7 @@ export function InkBlots({ className, intensity = 1, interactive = true, every =
         x = Math.round(x / grid) * grid;
         y = Math.round(y / grid) * grid;
       }
-      const base = Math.min(w, h) * (poet ? 0.11 : 0.07) * scale;
+      const base = Math.max(Math.min(w, h) * (poet ? 0.11 : 0.07), Math.max(w, h) * 0.055) * scale;
       blots.push({
         x,
         y,
@@ -82,7 +84,7 @@ export function InkBlots({ className, intensity = 1, interactive = true, every =
 
     const draw = (now: number) => {
       ctx.clearRect(0, 0, w, h);
-      ctx.fillStyle = `hsl(${theme.accent} / ${0.9 * intensity})`;
+      ctx.fillStyle = `hsl(${theme.accent} / ${(poet ? 0.55 : 0.62) * intensity})`;
       for (let i = blots.length - 1; i >= 0; i--) {
         const b = blots[i];
         const age = (now - b.born) / b.life;
@@ -118,7 +120,13 @@ export function InkBlots({ className, intensity = 1, interactive = true, every =
       }
     };
 
+    // ~24fps, and only while on screen and the tab is visible.
+    let visible = true;
+    let lastDraw = 0;
     const loop = (now: number) => {
+      raf = requestAnimationFrame(loop);
+      if (!visible || document.hidden || now - lastDraw < 40) return;
+      lastDraw = now;
       const dt = now - last;
       last = now;
       sinceBlot += dt;
@@ -127,8 +135,11 @@ export function InkBlots({ className, intensity = 1, interactive = true, every =
         add(w * (0.1 + Math.random() * 0.8), h * (0.15 + Math.random() * 0.7));
       }
       draw(now);
-      raf = requestAnimationFrame(loop);
     };
+    const io = new IntersectionObserver(([e]) => {
+      visible = e.isIntersecting;
+    });
+    io.observe(canvas);
 
     resize();
     // Seed a few so the canvas isn't empty on first paint.
@@ -137,11 +148,13 @@ export function InkBlots({ className, intensity = 1, interactive = true, every =
       blots[blots.length - 1].born -= isStatic ? 2500 : 900 * i;
     }
 
-    if (isStatic) {
-      draw(performance.now());
-    } else {
+    draw(performance.now());
+    // Start moving only once the browser is idle, so first paint and
+    // hydration never compete with the canvas.
+    const cancelIdle = isStatic ? () => {} : whenIdle(() => {
+      last = performance.now();
       raf = requestAnimationFrame(loop);
-    }
+    });
 
     const onPointer = (e: PointerEvent) => {
       const rect = canvas.getBoundingClientRect();
@@ -153,6 +166,8 @@ export function InkBlots({ className, intensity = 1, interactive = true, every =
     if (interactive && !isStatic) window.addEventListener("pointerdown", onPointer, { passive: true });
 
     return () => {
+      cancelIdle();
+      io.disconnect();
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", onResize);
       window.removeEventListener("pointerdown", onPointer);
@@ -163,7 +178,8 @@ export function InkBlots({ className, intensity = 1, interactive = true, every =
     <div
       aria-hidden="true"
       className={cn("pointer-events-none", className)}
-      style={{ filter: "url(#ink-blob)" }}
+      // The goo filter is CPU-rasterized every frame: full tier only.
+      style={tier === "full" ? { filter: register === "poet" ? "url(#ink-blob)" : "url(#ink-blob-hard)" } : undefined}
     >
       <canvas ref={canvasRef} className="block h-full w-full" />
     </div>

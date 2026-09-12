@@ -66,21 +66,23 @@ export function InkHeadline({
   const lines = useMemo(() => text.split("\n").map(tokenize), [text]);
   const plain = useMemo(() => text.replace(/\*/g, ""), [text]);
   let charIndex = 0;
+  let wordIndex = 0;
 
   useEffect(() => {
     const node = ref.current;
     if (!node) return;
     const chars = Array.from(node.querySelectorAll<HTMLElement>(".ink-char"));
 
+    const undo = () => node.classList.remove("is-inked");
     if (tier === "off") {
       node.classList.add("is-inked");
-      return;
+      return undo;
     }
 
     if (tier !== "full") {
       if (trigger === "mount") {
         node.classList.add("is-inked");
-        return;
+        return undo;
       }
       const io = new IntersectionObserver(
         ([e]) => {
@@ -92,7 +94,10 @@ export function InkHeadline({
         { threshold: 0.3 }
       );
       io.observe(node);
-      return () => io.disconnect();
+      return () => {
+        io.disconnect();
+        undo();
+      };
     }
 
     let ctx: { revert: () => void } | null = null;
@@ -146,7 +151,10 @@ export function InkHeadline({
         >
           {tokens.map((t, wi) => (
             <span key={wi}>
-              <span className={cn("ink-word", t.accent && "accent")}>
+              <span
+                className={cn("ink-word", t.accent && "accent")}
+                style={{ ["--w" as string]: wordIndex++ }}
+              >
                 {Array.from(t.word).map((ch, ci) => {
                   const i = charIndex++;
                   return (

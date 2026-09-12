@@ -26,39 +26,56 @@ html.lenis-on,
   overscroll-behavior: contain;
 }
 
-/* --- Ink headline: outlined from frame one, then fills --- */
+/* --- Ink headline: faint from frame one, then fills --- */
+/* Unfilled glyphs are faint ink (a second background layer), never a
+   stroke: text-stroke + background-clip misregisters in Chromium.
+   Full tier fills per character (GSAP tweens --fill on .ink-char).
+   Lite/off (and before hydration) fill per word: one painted element
+   per word instead of one per glyph, which is what phones can afford. */
 .ink-headline {
   display: block;
+  --ink: hsl(var(--foreground));
+  --ink-faint: hsl(var(--foreground) / 0.16);
 }
 .ink-word {
   display: inline-block;
   white-space: nowrap;
 }
+.ink-word.accent {
+  --ink: hsl(var(--primary));
+  --ink-faint: hsl(var(--primary) / 0.22);
+}
 .ink-char {
-  --fill: 0;
   display: inline-block;
+}
+html[data-motion="full"] .ink-char,
+html:not([data-motion="full"]) .ink-word {
+  --fill: 0;
   color: transparent;
-  -webkit-text-stroke: 1px hsl(var(--foreground) / 0.5);
   background-repeat: no-repeat;
   -webkit-background-clip: text;
   background-clip: text;
 }
 /* Engineer: a hard-edged pour, left to right. */
-.ink-headline[data-ink="pour"] .ink-char {
+html[data-motion="full"] .ink-headline[data-ink="pour"] .ink-char,
+html:not([data-motion="full"]) .ink-headline[data-ink="pour"] .ink-word {
   background-image: linear-gradient(
-    92deg,
-    hsl(var(--foreground)) 0%,
-    hsl(var(--foreground)) calc(var(--fill) * 118% - 18%),
-    transparent calc(var(--fill) * 118%)
-  );
+      92deg,
+      var(--ink) 0%,
+      var(--ink) calc(var(--fill) * 118% - 18%),
+      transparent calc(var(--fill) * 118%)
+    ),
+    linear-gradient(var(--ink-faint), var(--ink-faint));
 }
-/* Poet: ink blooms out from the middle of each glyph. */
-.ink-headline[data-ink="bloom"] .ink-char {
+/* Poet: ink blooms out from the middle. */
+html[data-motion="full"] .ink-headline[data-ink="bloom"] .ink-char,
+html:not([data-motion="full"]) .ink-headline[data-ink="bloom"] .ink-word {
   background-image: radial-gradient(
-    ellipse 70% 60% at 50% 55%,
-    hsl(var(--foreground)) calc(var(--fill) * 95%),
-    transparent calc(var(--fill) * 95% + 22%)
-  );
+      ellipse 70% 60% at 50% 55%,
+      var(--ink) calc(var(--fill) * 95%),
+      transparent calc(var(--fill) * 95% + 22%)
+    ),
+    linear-gradient(var(--ink-faint), var(--ink-faint));
 }
 @keyframes ink-fill {
   from {
@@ -68,39 +85,20 @@ html.lenis-on,
     --fill: 1;
   }
 }
-.ink-headline.is-inked .ink-char {
+html:not([data-motion="full"]) .ink-headline.is-inked .ink-word {
   animation: ink-fill 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
-  animation-delay: calc(var(--i) * 28ms + var(--ink-delay, 0ms));
+  animation-delay: calc(var(--w, 0) * 90ms + var(--ink-delay, 0ms));
 }
-.ink-headline[data-ink="bloom"].is-inked .ink-char {
+html:not([data-motion="full"]) .ink-headline[data-ink="bloom"].is-inked .ink-word {
   animation-duration: 1.4s;
   animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
 }
-.ink-headline.is-gsap .ink-char {
-  animation: none;
-}
-/* Accent-inked words */
-.ink-headline .ink-word.accent .ink-char {
-  -webkit-text-stroke-color: hsl(var(--primary) / 0.6);
-}
-.ink-headline[data-ink="pour"] .ink-word.accent .ink-char {
-  background-image: linear-gradient(
-    92deg,
-    hsl(var(--primary)) 0%,
-    hsl(var(--primary)) calc(var(--fill) * 118% - 18%),
-    transparent calc(var(--fill) * 118%)
-  );
-}
-.ink-headline[data-ink="bloom"] .ink-word.accent .ink-char {
-  background-image: radial-gradient(
-    ellipse 70% 60% at 50% 55%,
-    hsl(var(--primary)) calc(var(--fill) * 95%),
-    transparent calc(var(--fill) * 95% + 22%)
-  );
-}
 
 /* Hairline turbulence on display type: looks inked, not typeset. */
-.ink-text {
+/* Decorative SVG filters are rasterized on the CPU, so they only apply on
+   the full tier (html[data-motion="full"], set after first paint). Lite and
+   off tiers get the same shapes, un-filtered, and a fast first paint. */
+html[data-motion="full"] .ink-text {
   filter: url(#ink-text);
 }
 
@@ -118,8 +116,8 @@ html.lenis-on,
   font-size: clamp(8rem, 22vw, 18rem);
   line-height: 1;
   letter-spacing: -0.06em;
-  color: transparent;
-  -webkit-text-stroke: 1px hsl(var(--foreground) / 0.13);
+  color: hsl(var(--foreground) / 0.035);
+  -webkit-text-stroke: 1px hsl(var(--foreground) / 0.22);
   pointer-events: none;
   user-select: none;
 }
@@ -127,7 +125,8 @@ html.lenis-on,
   font-style: italic;
   font-weight: 400;
   letter-spacing: -0.02em;
-  -webkit-text-stroke: 1px hsl(var(--primary) / 0.22);
+  color: hsl(var(--primary) / 0.04);
+  -webkit-text-stroke: 1px hsl(var(--primary) / 0.32);
 }
 .running-label {
   position: absolute;
@@ -215,6 +214,8 @@ html.lenis-on,
   transform: rotate(var(--tilt));
   transform-origin: 50% 50%;
   transition: color 0.25s, border-color 0.25s, background-color 0.25s;
+}
+html[data-motion="full"] .stamp {
   filter: url(#ink-stamp);
 }
 .stamp-rubber {
@@ -231,6 +232,8 @@ html.lenis-on,
   font-size: 0.82rem;
   letter-spacing: 0.01em;
   text-transform: none;
+}
+html[data-motion="full"] .stamp-seal {
   filter: url(#ink-seal);
 }
 .stamp-solid {
@@ -250,12 +253,12 @@ button.stamp:hover,
 }
 .stamp-group .stamp:not(.is-gsap):not(.is-pressed) {
   opacity: 0;
-  transform: rotate(calc(var(--tilt) + 6deg)) scale(1.6);
+  transform: rotate(calc(var(--tilt) + 6deg)) scale(1.25);
 }
 @keyframes stamp-in {
   from {
     opacity: 0;
-    transform: rotate(calc(var(--tilt) + 6deg)) scale(1.6);
+    transform: rotate(calc(var(--tilt) + 6deg)) scale(1.25);
   }
   to {
     opacity: 1;
@@ -362,7 +365,8 @@ html.ink-cursor-on select {
 
 /* --- Reduced motion: everything finished, nothing moving --- */
 @media (prefers-reduced-motion: reduce) {
-  .ink-char {
+  .ink-char,
+  .ink-word {
     --fill: 1;
     animation: none !important;
   }
@@ -481,12 +485,16 @@ html.ink-cursor-on select {
   top: 0;
   height: 2px;
   background: hsl(var(--foreground) / 0.35);
-  filter: url(#ink-tear);
   pointer-events: none;
+}
+html[data-motion="full"] .plate-rule {
+  filter: url(#ink-tear);
 }
 [data-register="poet"] .plate-rule {
   height: 1.5px;
   background: hsl(var(--foreground) / 0.3);
+}
+html[data-motion="full"][data-register="poet"] .plate-rule {
   filter: url(#ink-bleed);
 }
 .plate-row:first-child .plate-rule {
@@ -503,6 +511,8 @@ html.ink-cursor-on select {
   transform: scaleX(0);
   transform-origin: 0 50%;
   transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+html[data-motion="full"] .plate-title::after {
   filter: url(#ink-tear);
 }
 .group:hover .plate-title::after {
@@ -545,11 +555,13 @@ html.ink-cursor-on select {
   --my: 50%;
   --rx: 0deg;
   --ry: 0deg;
-  background: hsl(var(--foreground) / 0.03);
-  border: 1.5px solid hsl(var(--foreground) / 0.18);
+  background: hsl(var(--foreground) / 0.035);
+  border: 1.5px solid hsl(var(--foreground) / 0.32);
   transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry));
   transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s;
   transform-style: preserve-3d;
+}
+html[data-motion="full"] .seal-card {
   filter: url(#ink-stamp);
 }
 .seal-card:hover {
@@ -593,8 +605,8 @@ html.ink-cursor-on select {
 }
 .seal-mark {
   position: absolute;
-  right: -0.35em;
-  top: -0.9em;
+  right: -0.2em;
+  top: -0.35em;
   width: 2.4em;
   height: 2.4em;
   display: flex;
@@ -607,7 +619,6 @@ html.ink-cursor-on select {
   font-weight: 800;
   color: hsl(var(--primary) / 0.5);
   transform: rotate(-12deg);
-  filter: url(#ink-seal);
   transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.3s;
   pointer-events: none;
 }

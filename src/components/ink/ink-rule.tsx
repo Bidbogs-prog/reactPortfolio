@@ -36,9 +36,10 @@ export function InkRule({ className, seed = 1 }: { className?: string; seed?: nu
   useEffect(() => {
     const svg = ref.current;
     if (!svg) return;
+    const undo = () => svg.classList.remove("is-drawn", "is-static");
     if (tier === "off") {
       svg.classList.add("is-drawn", "is-static");
-      return;
+      return undo;
     }
     if (tier !== "full") {
       const io = new IntersectionObserver(
@@ -51,7 +52,10 @@ export function InkRule({ className, seed = 1 }: { className?: string; seed?: nu
         { threshold: 0.5 }
       );
       io.observe(svg);
-      return () => io.disconnect();
+      return () => {
+        io.disconnect();
+        undo();
+      };
     }
     let ctx: { revert: () => void } | null = null;
     let cancelled = false;

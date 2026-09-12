@@ -47,9 +47,10 @@ export function Plotter({ className }: { className?: string }) {
     const svg = ref.current;
     if (!svg) return;
 
+    const undo = () => svg.classList.remove("is-drawn", "is-static");
     if (tier === "off") {
       svg.classList.add("is-drawn", "is-static");
-      return;
+      return undo;
     }
     if (tier !== "full") {
       const io = new IntersectionObserver(
@@ -62,7 +63,10 @@ export function Plotter({ className }: { className?: string }) {
         { threshold: 0.35 }
       );
       io.observe(svg);
-      return () => io.disconnect();
+      return () => {
+        io.disconnect();
+        undo();
+      };
     }
 
     let ctx: { revert: () => void } | null = null;

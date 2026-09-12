@@ -43,9 +43,15 @@ export function useInkReveal<T extends HTMLElement = HTMLDivElement>(
         el.classList.add("reveal");
         el.style.setProperty("--reveal-delay", `${Math.round((delay + i * stagger) * 1000)}ms`);
       });
+      // Undo on re-run: the tier may upgrade to "full" after first paint.
+      const undo = () =>
+        targets.forEach((el) => {
+          el.classList.remove("reveal", "is-visible");
+          el.style.removeProperty("--reveal-delay");
+        });
       if (tier === "off") {
         targets.forEach((el) => el.classList.add("is-visible"));
-        return;
+        return undo;
       }
       const io = new IntersectionObserver(
         (entries) => {
@@ -59,7 +65,10 @@ export function useInkReveal<T extends HTMLElement = HTMLDivElement>(
         { threshold: 0.12 }
       );
       targets.forEach((el) => io.observe(el));
-      return () => io.disconnect();
+      return () => {
+        io.disconnect();
+        undo();
+      };
     }
 
     let ctx: { revert: () => void } | null = null;

@@ -30,6 +30,16 @@ export function InkDefs() {
           <feGaussianBlur in="d" stdDeviation="0.6" />
         </filter>
 
+        {/* full-screen flood edges: big lobes (poet) / jagged plotter edge (engineer) */}
+        <filter id="ink-flood-poet" x="-20%" y="-20%" width="140%" height="140%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.006" numOctaves="3" seed="4" result="n" />
+          <feDisplacementMap in="SourceGraphic" in2="n" scale="140" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+        <filter id="ink-flood-engineer" x="-20%" y="-20%" width="140%" height="140%">
+          <feTurbulence type="turbulence" baseFrequency="0.02 0.05" numOctaves="2" seed="8" result="n" />
+          <feDisplacementMap in="SourceGraphic" in2="n" scale="70" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+
         <filter id="ink-text" x="-2%" y="-10%" width="104%" height="120%">
           <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" seed="11" result="n" />
           <feDisplacementMap in="SourceGraphic" in2="n" scale="1.4" xChannelSelector="R" yChannelSelector="G" />
@@ -51,6 +61,11 @@ export function InkDefs() {
         <filter id="ink-blob" x="-10%" y="-10%" width="120%" height="120%" colorInterpolationFilters="sRGB">
           <feGaussianBlur in="SourceGraphic" stdDeviation="14" result="b" />
           <feColorMatrix in="b" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 26 -10" />
+        </filter>
+        {/* engineer blots: barely blurred, so the grid-aligned blocks survive */}
+        <filter id="ink-blob-hard" x="-10%" y="-10%" width="120%" height="120%" colorInterpolationFilters="sRGB">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="b" />
+          <feColorMatrix in="b" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" />
         </filter>
       </defs>
     </svg>

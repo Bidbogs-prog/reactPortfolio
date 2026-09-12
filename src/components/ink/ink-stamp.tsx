@@ -67,9 +67,14 @@ export function InkStampGroup({
     const node = ref.current;
     if (!node) return;
     const stamps = Array.from(node.querySelectorAll<HTMLElement>(".stamp"));
+    const undo = () =>
+      stamps.forEach((s) => {
+        s.classList.remove("is-pressed");
+        s.style.removeProperty("--stamp-delay");
+      });
     if (tier === "off") {
       stamps.forEach((s) => s.classList.add("is-pressed"));
-      return;
+      return undo;
     }
     if (tier !== "full") {
       stamps.forEach((s, i) => s.style.setProperty("--stamp-delay", `${Math.round(i * stagger * 1000)}ms`));
@@ -83,7 +88,10 @@ export function InkStampGroup({
         { threshold: 0.2 }
       );
       io.observe(node);
-      return () => io.disconnect();
+      return () => {
+        io.disconnect();
+        undo();
+      };
     }
     let ctx: { revert: () => void } | null = null;
     let cancelled = false;

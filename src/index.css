@@ -2,6 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Metric-matched local fallbacks so the layout doesn't shift when the
+   web fonts land (Bricolage is 91.4% of Arial's width at 700). */
+@font-face {
+  font-family: "Bricolage Fallback";
+  src: local("Arial"), local("Helvetica");
+  size-adjust: 91.4%;
+  ascent-override: 96%;
+  descent-override: 24%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Hanken Fallback";
+  src: local("Arial"), local("Helvetica");
+  size-adjust: 101.8%;
+}
+/* JetBrains Mono advances 0.6em; match the common local monos so mono
+   labels and stamps wrap identically before and after the swap. */
+@font-face {
+  font-family: "JetBrains Fallback Consolas";
+  src: local("Consolas");
+  size-adjust: 109.1%;
+}
+@font-face {
+  font-family: "JetBrains Fallback Menlo";
+  src: local("Menlo");
+  size-adjust: 99.7%;
+}
+@font-face {
+  font-family: "JetBrains Fallback Courier";
+  src: local("Courier New");
+  size-adjust: 100%;
+}
+
 @layer base {
   /* ============================================================
      ENGINEER register — Ink & Lime, mono, structured (default)
@@ -39,9 +72,10 @@
 
     --radius: 0.75rem;
 
-    --font-display: "Bricolage Grotesque", "Hanken Grotesk", sans-serif;
-    --font-sans: "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
-    --font-mono: "JetBrains Mono", ui-monospace, monospace;
+    --font-display: "Bricolage Grotesque", "Bricolage Fallback", sans-serif;
+    --font-sans: "Hanken Grotesk", "Hanken Fallback", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", "JetBrains Fallback Consolas",
+      "JetBrains Fallback Menlo", "JetBrains Fallback Courier", ui-monospace, monospace;
 
     /* Per-register feel */
     --grid-opacity: 0.04;
@@ -86,7 +120,8 @@
 
     --font-display: "Fraunces", "Newsreader", Georgia, serif;
     --font-sans: "Newsreader", Georgia, "Hanken Grotesk", serif;
-    --font-mono: "JetBrains Mono", ui-monospace, monospace;
+    --font-mono: "JetBrains Mono", "JetBrains Fallback Consolas",
+      "JetBrains Fallback Menlo", "JetBrains Fallback Courier", ui-monospace, monospace;
 
     --grid-opacity: 0.025;
     --tracking-body: 0.005em;
@@ -115,7 +150,13 @@
     font-family: var(--font-sans);
     font-feature-settings: "ss01", "cv01";
     letter-spacing: var(--tracking-body);
-    overflow-x: hidden;
+    overflow-x: clip;
+  }
+
+  /* Off-screen transforms (stamps scaling in, bleeding illustrations)
+     must never create a horizontal scroll. */
+  html {
+    overflow-x: clip;
   }
 
   /* Offset anchored sections so they land below the fixed navbar */
@@ -192,15 +233,6 @@
     background-size: 56px 56px;
   }
 
-  /* Soft radial spotlight */
-  .bg-glow {
-    background: radial-gradient(
-      60% 50% at 50% 0%,
-      hsl(74 92% 60% / 0.1) 0%,
-      transparent 70%
-    );
-  }
-
   /* Grain overlay */
   .grain::before {
     content: "";
@@ -225,17 +257,6 @@
     opacity: 1;
     transform: translateY(0);
   }
-
-  .gradient-text {
-    background: linear-gradient(
-      180deg,
-      hsl(var(--foreground)) 0%,
-      hsl(240 5% 58%) 130%
-    );
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -258,12 +279,6 @@
     transform: none;
     filter: none;
   }
-}
-
-/* Characters still being decoded by the headline scramble (GSAP). */
-.scramble-char {
-  color: hsl(var(--primary));
-  opacity: 0.5;
 }
 
 @keyframes dotPulse {

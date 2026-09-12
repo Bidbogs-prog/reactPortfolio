@@ -111,7 +111,7 @@ export function InkFluid({
             const dx = (x - px) * rect.width * 6;
             const dy = (y - py) * rect.height * 6;
             const speed = Math.hypot(dx, dy);
-            sim.splat(x, y, dx, dy, Math.min(0.35, speed / 900));
+            sim.splat(x, y, dx, dy, Math.min(0.7, 0.06 + speed / 700));
           }
           px = x;
           py = y;

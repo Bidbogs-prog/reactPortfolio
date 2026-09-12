@@ -35,9 +35,14 @@ export function InkLines({
     if (tier !== "full") {
       node.classList.add("reveal");
       node.style.setProperty("--reveal-delay", `${Math.round(delay * 1000)}ms`);
+      // Undo on re-run: the tier may upgrade to "full" after first paint.
+      const undo = () => {
+        node.classList.remove("reveal", "is-visible");
+        node.style.removeProperty("--reveal-delay");
+      };
       if (tier === "off" || trigger === "mount") {
         node.classList.add("is-visible");
-        return;
+        return undo;
       }
       const io = new IntersectionObserver(
         ([e]) => {
@@ -49,7 +54,10 @@ export function InkLines({
         { threshold: 0.2 }
       );
       io.observe(node);
-      return () => io.disconnect();
+      return () => {
+        io.disconnect();
+        undo();
+      };
     }
 
     let ctx: { revert: () => void } | null = null;

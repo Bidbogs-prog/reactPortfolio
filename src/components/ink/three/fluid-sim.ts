@@ -246,8 +246,8 @@ export class FluidSim {
 
   /** A big idle drop: dye plus a small radial burst so it spreads. */
   drop(x: number, y: number, size = 1) {
-    const r = this.params.splatRadius * 9 * size;
-    this.splat(x, y, 0, 0, 1.2 * size, r);
+    const r = this.params.splatRadius * 12 * size;
+    this.splat(x, y, 0, 0, 1.4 * size, r);
     const n = 6;
     for (let i = 0; i < n; i++) {
       const a = (i / n) * Math.PI * 2 + Math.random();

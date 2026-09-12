@@ -39,10 +39,16 @@ export function getMotionTier(): MotionTier {
   return cached;
 }
 
+/** Mirror the tier on <html> so CSS can gate expensive decoration. */
+function reflect(tier: MotionTier) {
+  if (typeof document !== "undefined") document.documentElement.dataset.motion = tier;
+}
+
 function recompute() {
   const next = resolveMotionTier();
   if (next !== cached) {
     cached = next;
+    reflect(next);
     listeners.forEach((l) => l(next));
   }
 }
@@ -69,7 +75,9 @@ export function useMotionTier(): MotionTier {
   const [tier, setTier] = useState<MotionTier>("lite");
   useEffect(() => {
     watch();
-    setTier(getMotionTier());
+    const t = getMotionTier();
+    reflect(t);
+    setTier(t);
     listeners.add(setTier);
     return () => {
       listeners.delete(setTier);

@@ -188,7 +188,7 @@ export const displayFrag = /* glsl */ `
     // Plotter register: sample partly from the grid cell centre so ink
     // reads as blocks that sit on the 56px grid.
     vec2 cellUv = (floor(uv * gridCells) + 0.5) / gridCells;
-    uv = mix(uv, cellUv, gridSnap * 0.3);
+    uv = mix(uv, cellUv, gridSnap * 0.22);
 
     float d = texture2D(uDye, uv).r * intensity;
     float density = clamp(d, 0.0, 1.5);
@@ -204,6 +204,6 @@ export const displayFrag = /* glsl */ `
     float dithered = step(t, alpha);
     alpha = mix(alpha, dithered * max(alpha, 0.6), dither);
 
-    gl_FragColor = vec4(col, alpha * 0.92);
+    gl_FragColor = vec4(col, alpha * 0.8);
   }
 `;

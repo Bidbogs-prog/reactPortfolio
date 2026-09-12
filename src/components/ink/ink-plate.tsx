@@ -74,7 +74,9 @@ export function InkPlateProvider({ images, children }: { images: string[]; child
           vel.y = ny - pos.y;
           pos.x = nx;
           pos.y = ny;
-          canvas.style.transform = `translate3d(${pos.x - W / 2}px, ${pos.y - H / 2}px, 0) rotate(${vel.x * 0.06}deg)`;
+          // Sit beside the cursor (right of it, or left near the edge), never under the title.
+          const left = pos.x + 36 + W > window.innerWidth ? pos.x - 36 - W : pos.x + 36;
+          canvas.style.transform = `translate3d(${left}px, ${pos.y - H / 2}px, 0) rotate(${vel.x * 0.06}deg)`;
           scene?.setTilt(Math.max(-1, Math.min(1, vel.x / 40)), Math.max(-1, Math.min(1, vel.y / 40)));
           const drawing = scene?.tick(dt, poet ? 3.5 : 7) ?? false;
           active = drawing;
@@ -86,7 +88,7 @@ export function InkPlateProvider({ images, children }: { images: string[]; child
     });
 
     const onMove = (e: PointerEvent) => {
-      target.x = e.clientX + 40;
+      target.x = e.clientX;
       target.y = e.clientY;
       if (!active && pos.x < -500) {
         pos.x = target.x;

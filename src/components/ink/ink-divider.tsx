@@ -14,6 +14,8 @@ export function InkDivider({ className }: { className?: string }) {
   const tier = useMotionTier();
   const ref = useRef<SVGSVGElement>(null);
   const poet = register === "poet";
+  // Turbulence is CPU-rasterized: only on the full tier.
+  const filtered = tier === "full";
 
   // Deterministic drip layout so SSR and client agree.
   const drips = useMemo(
@@ -66,7 +68,7 @@ export function InkDivider({ className }: { className?: string }) {
       preserveAspectRatio="none"
     >
       {poet ? (
-        <g style={{ filter: "url(#ink-bleed)" }}>
+        <g style={filtered ? { filter: "url(#ink-bleed)" } : undefined}>
           <rect x="0" y="6" width="1000" height="2.2" fill="currentColor" opacity="0.55" />
           {drips.map((d, i) => (
             <rect
@@ -91,7 +93,7 @@ export function InkDivider({ className }: { className?: string }) {
             height="1.6"
             fill="currentColor"
             opacity="0.5"
-            style={{ filter: "url(#ink-tear)" }}
+            style={filtered ? { filter: "url(#ink-tear)" } : undefined}
           />
         </g>
       )}

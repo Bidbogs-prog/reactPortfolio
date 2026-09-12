@@ -21,28 +21,15 @@ export default {
         sans: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
         display: ["var(--font-display)", "sans-serif"],
         mono: ["var(--font-mono)", "ui-monospace", "monospace"],
-        grotesk: ["Bricolage Grotesque", "Hanken Grotesk", "sans-serif"],
         serif: ["Fraunces", "Newsreader", "Georgia", "serif"],
       },
       animation: {
         blink: "blink 1.1s step-end infinite",
-        float: "float 8s ease-in-out infinite",
-        "float-slow": "float 12s ease-in-out infinite",
-        "spin-slow": "spin 18s linear infinite",
-        marquee: "marquee 32s linear infinite",
       },
       keyframes: {
         blink: {
           "0%, 100%": { opacity: "1" },
           "50%": { opacity: "0" },
-        },
-        float: {
-          "0%, 100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-22px)" },
-        },
-        marquee: {
-          "0%": { transform: "translateX(0)" },
-          "100%": { transform: "translateX(-50%)" },
         },
       },
       borderRadius: {

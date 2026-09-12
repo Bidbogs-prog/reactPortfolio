@@ -79,7 +79,7 @@ export function InkTransitionProvider({ children }: { children: ReactNode }) {
       Math.hypot(ox, h - oy),
       Math.hypot(w - ox, h - oy)
     );
-    const rMax = far * 1.18;
+    const rMax = far * 1.35;
     const poet = registerRef.current === "poet";
     const exit = opts.exit ?? (poet ? "drain" : "absorb");
 
@@ -93,7 +93,7 @@ export function InkTransitionProvider({ children }: { children: ReactNode }) {
 
     if (currentTier === "full") {
       const { gsap } = await import("@/lib/motion/gsap");
-      svg.style.filter = poet ? "url(#ink-bleed)" : "url(#ink-tear)";
+      svg.style.filter = poet ? "url(#ink-flood-poet)" : "url(#ink-flood-engineer)";
       await gsap.to(circle, {
         attr: { r: rMax },
         duration: poet ? 1.1 : 0.7,
