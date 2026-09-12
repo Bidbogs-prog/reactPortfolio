@@ -8,11 +8,14 @@ export interface Project {
   githubUrl: string;
   /** Optional highlight shown as a one-line outcome. */
   highlight?: string;
+  /** 1200x750 screenshot under public/, shown on hover / inline on mobile. */
+  image: string;
 }
 
 export const projects: Project[] = [
   {
     id: "so3ra",
+    image: "/work/so3ra.webp",
     title: "So3ra",
     year: "2026",
     description:
@@ -24,6 +27,7 @@ export const projects: Project[] = [
   },
   {
     id: "pieces-maroc",
+    image: "/work/pieces-maroc.webp",
     title: "PiecesMaroc",
     year: "2026",
     description:
@@ -35,6 +39,7 @@ export const projects: Project[] = [
   },
   {
     id: "expensio",
+    image: "/work/expensio.webp",
     title: "Expensio",
     year: "2024",
     description:
@@ -46,6 +51,7 @@ export const projects: Project[] = [
   },
   {
     id: "clanker-support",
+    image: "/work/clanker-support.webp",
     title: "Clanker Support",
     year: "2026",
     description:

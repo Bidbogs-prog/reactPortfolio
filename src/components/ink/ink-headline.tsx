@@ -13,8 +13,11 @@ interface InkHeadlineProps {
   className?: string;
   /** Extra class per line, by index (e.g. to indent the second line). */
   lineClassName?: (index: number) => string | undefined;
-  /** "mount": pour in on first paint (hero). "scroll": pour in when seen. */
-  trigger?: "mount" | "scroll";
+  /**
+   * "mount": pour in on first paint (hero). "scroll": pour in when seen.
+   * "scrub": fill follows the scroll position (full tier; lite = scroll).
+   */
+  trigger?: "mount" | "scroll" | "scrub";
   /** Seconds before the pour starts. */
   delay?: number;
   /** Seconds between adjacent characters. */
@@ -99,6 +102,15 @@ export function InkHeadline({
       ctx = gsap.context(() => {
         node.classList.add("is-gsap");
         gsap.set(chars, { "--fill": 0 });
+        if (trigger === "scrub") {
+          gsap.to(chars, {
+            "--fill": 1,
+            ease: "none",
+            stagger: { each: stagger, from: "start" },
+            scrollTrigger: { trigger: node, start: "top 95%", end: "bottom 70%", scrub: 0.8 },
+          });
+          return;
+        }
         gsap.to(chars, {
           "--fill": 1,
           duration: mode === "bloom" ? 1.4 : 0.9,

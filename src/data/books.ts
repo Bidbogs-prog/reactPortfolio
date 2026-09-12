@@ -5,6 +5,8 @@ export interface Book {
   role: string;
   publisher: string;
   description: string;
+  /** Cover plate under public/. */
+  image: string;
 }
 
 /**
@@ -15,6 +17,7 @@ export interface Book {
 export const books: Book[] = [
   {
     id: "maps-of-the-past",
+    image: "/work/books/maps-of-the-past.svg",
     title: "Maps of the Past",
     year: "2025",
     role: "Editor — English edition",
@@ -24,6 +27,7 @@ export const books: Book[] = [
   },
   {
     id: "women-writing-our-lives",
+    image: "/work/books/women-writing-our-lives.svg",
     title: "Women Writing Our Lives",
     year: "2024",
     role: "Editor — English edition",
@@ -33,6 +37,7 @@ export const books: Book[] = [
   },
   {
     id: "life-in-the-temporary",
+    image: "/work/books/life-in-the-temporary.svg",
     title: "Life in the Temporary",
     year: "2023",
     role: "Editor — English edition",

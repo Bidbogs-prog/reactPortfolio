@@ -1,9 +1,9 @@
-import { useEffect, useRef, type ElementType, type ReactNode } from "react";
+import { useEffect, useRef, type ElementType, type HTMLAttributes, type ReactNode } from "react";
 import { useRegister } from "@/lib/register";
 import { useMotionTier } from "@/lib/motion/tier";
 import { cn } from "@/lib/utils";
 
-interface InkStampProps {
+interface InkStampProps extends Omit<HTMLAttributes<HTMLElement>, "children"> {
   children: ReactNode;
   className?: string;
   as?: ElementType;
@@ -26,6 +26,8 @@ export function InkStamp({
   index = 0,
   shape = "auto",
   solid = false,
+  style,
+  ...rest
 }: InkStampProps) {
   const { register } = useRegister();
   const resolved = shape === "auto" ? (register === "poet" ? "seal" : "rubber") : shape;
@@ -34,7 +36,8 @@ export function InkStamp({
   return (
     <Tag
       className={cn("stamp", `stamp-${resolved}`, solid && "stamp-solid", className)}
-      style={{ ["--tilt" as string]: `${tilt * 0.6}deg`, ["--i" as string]: index }}
+      style={{ ["--tilt" as string]: `${tilt * 0.6}deg`, ["--i" as string]: index, ...style }}
+      {...rest}
     >
       {children}
     </Tag>

@@ -1,33 +1,92 @@
-import { SectionHeading } from "@/components/section-heading";
-import { Reveal } from "@/components/reveal";
+import { useId, useState } from "react";
+import { SectionFrame } from "@/components/section-frame";
+import { InkRule } from "@/components/ink/ink-rule";
+import { useInkReveal } from "@/lib/motion/use-ink-reveal";
 import { faq } from "@/data/faq";
+import { useRegister } from "@/lib/register";
+import { cn } from "@/lib/utils";
 
-export default function FaqSection() {
+function FaqItem({
+  q,
+  a,
+  index,
+  open,
+  onToggle,
+}: {
+  q: string;
+  a: string;
+  index: number;
+  open: boolean;
+  onToggle: () => void;
+}) {
+  const id = useId();
+  const { register } = useRegister();
+  const poet = register === "poet";
+
   return (
-    <section id="faq" className="relative border-t border-border/60 py-24 md:py-32">
-      <div className="container">
-        <SectionHeading eyebrow="FAQ" title="Questions, answered" />
-
-        <div className="flex flex-col">
-          {faq.map((item, i) => (
-            <Reveal key={item.q} delay={i * 50}>
-              <div className="grid gap-3 border-t border-border/60 py-8 md:grid-cols-[auto_1fr] md:gap-10">
-                <span className="font-mono text-sm text-muted-foreground/60">
-                  0{i + 1}
-                </span>
-                <div className="max-w-2xl">
-                  <h3 className="font-display text-xl font-semibold text-foreground md:text-2xl">
-                    {item.q}
-                  </h3>
-                  <p className="mt-3 text-pretty leading-relaxed text-muted-foreground">
-                    {item.a}
-                  </p>
-                </div>
-              </div>
-            </Reveal>
-          ))}
+    <div className="faq-item">
+      <InkRule seed={index + 3} />
+      <h3>
+        <button
+          type="button"
+          aria-expanded={open}
+          aria-controls={id}
+          onClick={onToggle}
+          className="group grid w-full grid-cols-[auto_1fr_auto] items-baseline gap-5 py-6 text-left md:gap-10 md:py-8"
+        >
+          <span className="font-mono text-sm text-muted-foreground/60">0{index + 1}</span>
+          <span
+            className={cn(
+              "display text-xl text-foreground transition-colors group-hover:text-primary md:text-2xl",
+              poet && "font-medium italic"
+            )}
+          >
+            {q}
+          </span>
+          {/* an ink dot that swells open */}
+          <span
+            aria-hidden="true"
+            className={cn(
+              "faq-dot relative mt-1 block h-3 w-3 rounded-full border border-foreground/50 transition-all duration-500 ease-fluid",
+              open && "border-primary bg-primary scale-125"
+            )}
+          />
+        </button>
+      </h3>
+      <div
+        id={id}
+        role="region"
+        className={cn("faq-panel grid", open && "is-open")}
+        aria-hidden={!open}
+      >
+        <div className="faq-inner min-h-0 overflow-hidden">
+          <p className="max-w-2xl pb-8 pl-[calc(1.25rem+1.25rem)] text-pretty leading-relaxed text-muted-foreground md:pl-[calc(1.25rem+2.5rem)]">
+            {a}
+          </p>
         </div>
       </div>
-    </section>
+    </div>
+  );
+}
+
+export default function FaqSection() {
+  const [open, setOpen] = useState<number | null>(0);
+  const listRef = useInkReveal<HTMLDivElement>({ stagger: 0.07, selector: ".faq-item" });
+
+  return (
+    <SectionFrame id="faq" eyebrow="FAQ" title="Questions, answered" note="short answers, no fluff">
+      <div ref={listRef} className="flex flex-col">
+        {faq.map((item, i) => (
+          <FaqItem
+            key={item.q}
+            q={item.q}
+            a={item.a}
+            index={i}
+            open={open === i}
+            onToggle={() => setOpen(open === i ? null : i)}
+          />
+        ))}
+      </div>
+    </SectionFrame>
   );
 }

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" width="1200" height="750">
+  <rect width="1200" height="750" fill="#150f0b"/>
+  <rect x="60" y="60" width="1080" height="630" fill="none" stroke="#e9a06a" stroke-opacity="0.35" stroke-width="2"/>
+  <rect x="76" y="76" width="1048" height="598" fill="none" stroke="#e9a06a" stroke-opacity="0.18" stroke-width="1"/>
+  <text x="120" y="160" font-family="Georgia, 'Times New Roman', serif" font-size="22" letter-spacing="6" fill="#e9a06a" fill-opacity="0.85">THE OLIVE WRITERS · 2025</text>
+  <text font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-size="104" fill="#f1e6d8"><tspan x="120" y="270">Maps of the</tspan><tspan x="120" y="390">Past</tspan></text>
+  <text x="120" y="620" font-family="Georgia, 'Times New Roman', serif" font-size="24" fill="#c9b8a6">Short stories · English / Arabic</text>
+  <circle cx="1010" cy="560" r="64" fill="#e9a06a" fill-opacity="0.9"/>
+  <text x="1010" y="572" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="34" fill="#150f0b">ed.</text>
+</svg>
